@@ -33,7 +33,8 @@ rf = sqrt(nf .* nf + ef .* ef);
 thetaf = atan2(ef, nf);
 
 figure("name", "Parametric");
-plot(e, n, ".", ez, nz, "o", ef, nf, "*");
+#plot(e, n, ".", ez, nz, "o", ef, nf, "*");
+plot(ez, nz, ".", ef, nf, "*");
 axis([-50, 50, -50, 50], "square");
 set(gca(), "xgrid", "on", "ygrid", "on");
 
