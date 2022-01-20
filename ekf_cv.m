@@ -84,7 +84,7 @@ function [n, vn, e, ve, Pne] = ekf_cv(t, r, theta, var_p, var_r, var_theta)
         dtheta = theta(k) - thetap;
         if (dtheta < -pi)
             dtheta += 2 * pi;
-        elseif (dtheta > pi)
+        elseif (dtheta >= pi)
             dtheta -= 2 * pi;
         endif
         
