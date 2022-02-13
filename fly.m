@@ -38,28 +38,14 @@ function fly(scenario)
 
     # Generate filtered data
 
-    #[nf, vnf, ef, vef, Pnef] = kf_cv(t, rz, thetaz, 0.1, 0.1, 0.1);
-    #[nf, vnf, ef, vef, Pnef] = ekf_cv(t, rz, thetaz, 0.1, 0.1, 0.1);
-    [nf, vnf, ef, vef, Pnef] = ukf_cv(t, rz, thetaz, 0.1, 0.1, 0.1);
+    [n_kf, vn_kf, e_kf, ve_kf, Pne_kf] = kf_cv(t, rz, thetaz, 0.1, 0.1, 0.1);
+    [n_ekf, vn_ekf, e_ekf, ve_ekf, Pne_ekf] = ekf_cv(t, rz, thetaz, 0.1, 0.1, 0.1);
+    [n_ukf, vn_ukf, e_ukf, ve_ukf, Pne_ukf] = ukf_cv(t, rz, thetaz, 0.1, 0.1, 0.1);
 
     # Plot results
 
-    rf = sqrt(nf .* nf + ef .* ef);
-    thetaf = atan2(ef, nf);
-
-    figure("name", "Parametric");
-    plot(ez, nz, ".", ef, nf, "*", e, n, "o");
-    axis([-50, 50, -50, 50], "square");
-    set(gca, 'xtick', -50:10:50);
-    set(gca, 'ytick', -50:10:50);
-    set(gca(), "xgrid", "on", "ygrid", "on");
-
-    figure("name", "Range");
-    plot(t, rz, ".", t, rf, "*", t, r, "o");
-    set(gca(), "xgrid", "on", "ygrid", "on");
-
-    figure("name", "Angle");
-    plot(t, thetaz, ".", t, thetaf, "*", t, theta, "o");
-    set(gca(), "xgrid", "on", "ygrid", "on");
+    plot_results("KF", t, n, e, r, theta, nz, ez, rz, thetaz, n_kf, vn_kf, e_kf, ve_kf, Pne_kf);
+    plot_results("EKF", t, n, e, r, theta, nz, ez, rz, thetaz, n_ekf, vn_ekf, e_ekf, ve_ekf, Pne_ekf);
+    plot_results("UKF", t, n, e, r, theta, nz, ez, rz, thetaz, n_ukf, vn_ukf, e_ukf, ve_ukf, Pne_ukf);
 
 endfunction
