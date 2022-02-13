@@ -31,11 +31,7 @@ function fly(scenario)
 
     rz = r + 0.5 * 2 * (rand(1, length(t)) - 0.5);
     thetaz = theta + 0.2 * 2 * (rand(1, length(t)) - 0.5);
-    if (thetaz >= pi)
-        thetaz -= two_pi;
-    elseif (thetaz < -pi)
-        thetaz += two_pi;
-    endif
+    thetaz = wrapToPi(thetaz);
 
     nz = rz .* cos(thetaz);
     ez = rz .* sin(thetaz);
@@ -43,7 +39,8 @@ function fly(scenario)
     # Generate filtered data
 
     #[nf, vnf, ef, vef, Pnef] = kf_cv(t, rz, thetaz, 0.1, 0.1, 0.1);
-    [nf, vnf, ef, vef, Pnef] = ekf_cv(t, rz, thetaz, 0.1, 0.1, 0.1);
+    #[nf, vnf, ef, vef, Pnef] = ekf_cv(t, rz, thetaz, 0.1, 0.1, 0.1);
+    [nf, vnf, ef, vef, Pnef] = ukf_cv(t, rz, thetaz, 0.1, 0.1, 0.1);
 
     # Plot results
 

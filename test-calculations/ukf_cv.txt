@@ -1,0 +1,329 @@
+
+t_1 = 0
+z_1 = [ 1.4142 ;
+        0.7854 ]
+
+t_2 = 1
+z_2 = [ 2.2361 ;
+        0.4636 ]
+
+
+x_1 = [ 1 ;
+        0 ;
+        1 ;
+        0 ]
+
+P_1 = [ 1 0 0 0 ;
+        0 1 0 0 ;
+        0 0 1 0 ;
+        0 0 0 1 ]
+
+
+Phi_2 = [ 1 1 0 0 ;
+          0 1 0 0 ;
+          0 0 1 1 ;
+          0 0 0 1 ]
+
+Q_2 = [ 0.25  0.5   0     0   ;
+        0.5   1     0     0   ;
+        0     0     0.25  0.5 ;
+        0     0     0.5   1   ]
+
+xp_2 = [ 1 ;
+         0 ;
+         1 ;
+         0 ]
+
+Pp_2 = [ 2.25   1.50   0      0   ;
+         1.5    2      0      0   ;
+         0      0      2.25   1.5 ;
+         0      0      1.5    2   ]
+
+N = 4
+two_N_plus_1 = 2 * N + 1
+alpha = 0.5
+beta = 2
+kappa = 0
+
+lambda = alpha * alpha * (N + kappa) - N
+       = -3
+
+sqrt_N_plus_lambda = sqrt(alpha * alpha * (N + kappa))
+                   = 1
+
+Wm0 = lambda / (N + lambda)
+    = -3
+
+Wc0 = Wm0 + 1 - alpha * alpha + beta
+    = -0.25
+
+Wi = 1 / (2 * (N + lambda))
+   = 0.5
+
+
+L = sqrt_N_plus_lambda * chol(Pp_2, "lower")
+L = [ 1.5000        0        0        0 ;
+      1.0000   1.0000        0        0 ;
+           0        0   1.5000        0 ;
+           0        0   1.0000   1.0000 ]
+
+
+X = zeros(N, two_N_plus_1)
+
+X(:,1) = xp_2
+
+X(:,2) = xp_2 + L(:,1)
+X(:,6) = xp_2 - L(:,1)
+
+X(:,3) = xp_2 + L(:,2)
+X(:,7) = xp_2 - L(:,2)
+
+X(:,4) = xp_2 + L(:,3)
+X(:,8) = xp_2 - L(:,3)
+
+X(:,5) = xp_2 + L(:,4)
+X(:,9) = xp_2 - L(:,4)
+
+X = [ 1.0000   2.5000   1.0000   1.0000   1.0000  -0.5000   1.0000   1.0000   1.0000 ;
+           0   1.0000   1.0000        0        0  -1.0000  -1.0000        0        0 ;
+      1.0000   1.0000   1.0000   2.5000   1.0000   1.0000   1.0000  -0.5000   1.0000 ;
+           0        0        0   1.0000   1.0000        0        0  -1.0000  -1.0000 ]
+
+
+Wm = zeros(1,two_N_plus_1)
+Wc = zeros(1,two_N_plus_1)
+
+Wm(1) = Wm0
+Wc(1) = Wc0
+
+Wm(2) = Wi
+Wc(2) = Wi
+
+Wm(3) = Wi
+Wc(3) = Wi
+
+Wm(4) = Wi
+Wc(4) = Wi
+
+Wm(5) = Wi
+Wc(5) = Wi
+
+Wm(6) = Wi
+Wc(6) = Wi
+
+Wm(7) = Wi
+Wc(7) = Wi
+
+Wm(8) = Wi
+Wc(8) = Wi
+
+Wm(9) = Wi
+Wc(9) = Wi
+
+Wm = [ -3.0000   0.5000   0.5000   0.5000   0.5000   0.5000   0.5000   0.5000   0.5000 ]
+
+Wc = [ -0.2500   0.5000   0.5000   0.5000   0.5000   0.5000   0.5000   0.5000   0.5000 ]
+
+zp = zeros(2,1)
+h_X = zeros(2, two_N_plus_1)
+
+X_i = X(:,1)
+Wm_i = Wm(1)
+h_X_i = [ sqrt(X_i(1) * X_i(1) + X_i(3) * X_i(3)) ;
+          atan2(X_i(3), X_i(1))                   ]
+h_X(:,1) = h_X_i
+zp += Wm_i * h_X_i
+
+X_i = X(:,2)
+Wm_i = Wm(2)
+h_X_i = [ sqrt(X_i(1) * X_i(1) + X_i(3) * X_i(3)) ;
+          atan2(X_i(3), X_i(1))                   ]
+h_X(:,2) = h_X_i
+zp += Wm_i * h_X_i
+
+X_i = X(:,3)
+Wm_i = Wm(3)
+h_X_i = [ sqrt(X_i(1) * X_i(1) + X_i(3) * X_i(3)) ;
+          atan2(X_i(3), X_i(1))                   ]
+h_X(:,3) = h_X_i
+zp += Wm_i * h_X_i
+
+X_i = X(:,4)
+Wm_i = Wm(4)
+h_X_i = [ sqrt(X_i(1) * X_i(1) + X_i(3) * X_i(3)) ;
+          atan2(X_i(3), X_i(1))                   ]
+h_X(:,4) = h_X_i
+zp += Wm_i * h_X_i
+
+X_i = X(:,5)
+Wm_i = Wm(5)
+h_X_i = [ sqrt(X_i(1) * X_i(1) + X_i(3) * X_i(3)) ;
+          atan2(X_i(3), X_i(1))                   ]
+h_X(:,5) = h_X_i
+zp += Wm_i * h_X_i
+
+X_i = X(:,6)
+Wm_i = Wm(6)
+h_X_i = [ sqrt(X_i(1) * X_i(1) + X_i(3) * X_i(3)) ;
+          atan2(X_i(3), X_i(1))                   ]
+h_X(:,6) = h_X_i
+zp += Wm_i * h_X_i
+
+X_i = X(:,7)
+Wm_i = Wm(7)
+h_X_i = [ sqrt(X_i(1) * X_i(1) + X_i(3) * X_i(3)) ;
+          atan2(X_i(3), X_i(1))                   ]
+h_X(:,7) = h_X_i
+zp += Wm_i * h_X_i
+
+X_i = X(:,8)
+Wm_i = Wm(8)
+h_X_i = [ sqrt(X_i(1) * X_i(1) + X_i(3) * X_i(3)) ;
+          atan2(X_i(3), X_i(1))                   ]
+h_X(:,8) = h_X_i
+zp += Wm_i * h_X_i
+
+X_i = X(:,9)
+Wm_i = Wm(9)
+h_X_i = [ sqrt(X_i(1) * X_i(1) + X_i(3) * X_i(3)) ;
+          atan2(X_i(3), X_i(1))                   ]
+h_X(:,9) = h_X_i
+zp += Wm_i * h_X_i
+
+h_X = [ 1.4142   2.6926   1.4142   2.6926   1.4142   1.1180   1.4142   1.1180   1.4142 ;
+        0.7854   0.3805   0.7854   1.1903   0.7854   2.0344   0.7854  -0.4636   0.7854 ]
+
+zp = [ 2.3964 ;
+       0.7854 ]
+
+
+Pxz = zeros(4,2)
+Pzz = zeros(2,2)
+
+X_i = X(:,1)
+h_X_i = h_X(:,1)
+Wc_i = Wc(1)
+dx = X_i - xp_2
+dz = h_X_i - zp
+dz(2) = wrapToPi(dz(2))
+Pxz += Wc_i * (dx * dz')
+Pzz += Wc_i * (dz * dz')
+
+X_i = X(:,2)
+h_X_i = h_X(:,2)
+Wc_i = Wc(2)
+dx = X_i - xp_2
+dz = h_X_i - zp
+dz(2) = wrapToPi(dz(2))
+Pxz += Wc_i * (dx * dz')
+Pzz += Wc_i * (dz * dz')
+
+X_i = X(:,3)
+h_X_i = h_X(:,3)
+Wc_i = Wc(3)
+dx = X_i - xp_2
+dz = h_X_i - zp
+dz(2) = wrapToPi(dz(2))
+Pxz += Wc_i * (dx * dz')
+Pzz += Wc_i * (dz * dz')
+
+X_i = X(:,4)
+h_X_i = h_X(:,4)
+Wc_i = Wc(4)
+dx = X_i - xp_2
+dz = h_X_i - zp
+dz(2) = wrapToPi(dz(2))
+Pxz += Wc_i * (dx * dz')
+Pzz += Wc_i * (dz * dz')
+
+X_i = X(:,5)
+h_X_i = h_X(:,5)
+Wc_i = Wc(5)
+dx = X_i - xp_2
+dz = h_X_i - zp
+dz(2) = wrapToPi(dz(2))
+Pxz += Wc_i * (dx * dz')
+Pzz += Wc_i * (dz * dz')
+
+X_i = X(:,6)
+h_X_i = h_X(:,6)
+Wc_i = Wc(6)
+dx = X_i - xp_2
+dz = h_X_i - zp
+dz(2) = wrapToPi(dz(2))
+Pxz += Wc_i * (dx * dz')
+Pzz += Wc_i * (dz * dz')
+
+X_i = X(:,7)
+h_X_i = h_X(:,7)
+Wc_i = Wc(7)
+dx = X_i - xp_2
+dz = h_X_i - zp
+dz(2) = wrapToPi(dz(2))
+Pxz += Wc_i * (dx * dz')
+Pzz += Wc_i * (dz * dz')
+
+X_i = X(:,8)
+h_X_i = h_X(:,8)
+Wc_i = Wc(8)
+dx = X_i - xp_2
+dz = h_X_i - zp
+dz(2) = wrapToPi(dz(2))
+Pxz += Wc_i * (dx * dz')
+Pzz += Wc_i * (dz * dz')
+
+X_i = X(:,9)
+h_X_i = h_X(:,9)
+Wc_i = Wc(9)
+dx = X_i - xp_2
+dz = h_X_i - zp
+dz(2) = wrapToPi(dz(2))
+Pxz += Wc_i * (dx * dz')
+Pzz += Wc_i * (dz * dz')
+
+
+Pxz = [ 1.1809  -1.2405 ;
+        0.7873  -0.8270 ;
+        1.1809   1.2405 ;
+        0.7873   0.8270 ]
+
+Pzz = [ 3.4102        0 ;
+             0   1.7241 ]
+
+R = [ 1 0 ;
+      0 1 ]
+
+S = Pzz + R
+
+S = [ 4.4102        0 ;
+           0   2.7241 ]
+
+K = Pxz * inv(S)
+
+K = [ 0.2678  -0.4554 ;
+      0.1785  -0.3036 ;
+      0.2678   0.4554 ;
+      0.1785   0.3036 ]
+
+
+dr = z_2(1) - zp(1)
+dtheta = wrapToPi(z_2(2) - zp(2));
+dz = [ dr ; dtheta ]
+
+dz = [ -0.1603 ;
+       -0.3218 ]
+
+x_2 = xp_2 + K * dz
+
+x_2 = [ 1.103613 ;
+        0.069075 ;
+        0.810538 ;
+       -0.126308 ]
+
+
+P_2 = Pp_2 - K * S * K'
+
+P_2 = [ 1.3689   0.9126   0.2487   0.1658 ;
+        0.9126   1.6084   0.1658   0.1105 ;
+        0.2487   0.1658   1.3689   0.9126 ;
+        0.1658   0.1105   0.9126   1.6084 ]

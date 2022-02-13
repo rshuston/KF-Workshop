@@ -42,16 +42,6 @@ function [n, vn, e, ve, Pne] = kf_cv(t, r, theta, var_p, var_r, var_theta)
         T3d2 = T * T * T / 2;
         T4d4 = T * T * T * T / 4;
         
-#        Q = [ T2 , T , T2 , T ;
-#              T  , 1 , T  , 1 ;
-#              T2 , T , T2 , T ;
-#              T  , 1 , T  , 1 ] * var_p;
-  
-#        Q = [ T4d4 , T3d2 , T4d4 , T3d2 ;
-#              T3d2 , T2   , T3d2 , T2   ;
-#              T4d4 , T3d2 , T4d4 , T3d2 ;
-#              T3d2 , T2   , T3d2 , T2   ] * var_p;
-        
 #        Q = [ T2 , T , 0  , 0 ;
 #              T  , 1 , 0  , 0 ;
 #              0  , 0 , T2 , T ;

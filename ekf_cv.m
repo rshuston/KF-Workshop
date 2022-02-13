@@ -42,16 +42,6 @@ function [n, vn, e, ve, Pne] = ekf_cv(t, r, theta, var_p, var_r, var_theta)
         T3d2 = T * T * T / 2;
         T4d4 = T * T * T * T / 4;
         
-#        Q = [ T2 , T , T2 , T ;
-#              T  , 1 , T  , 1 ;
-#              T2 , T , T2 , T ;
-#              T  , 1 , T  , 1 ] * var_p;
-  
-#        Q = [ T4d4 , T3d2 , T4d4 , T3d2 ;
-#              T3d2 , T2   , T3d2 , T2   ;
-#              T4d4 , T3d2 , T4d4 , T3d2 ;
-#              T3d2 , T2   , T3d2 , T2   ] * var_p;
-        
 #        Q = [ T2 , T , 0  , 0 ;
 #              T  , 1 , 0  , 0 ;
 #              0  , 0 , T2 , T ;
@@ -81,13 +71,7 @@ function [n, vn, e, ve, Pne] = ekf_cv(t, r, theta, var_p, var_r, var_theta)
         thetap = atan2(xp(3), xp(1));
         
         dr = r(k) - rp;
-        dtheta = theta(k) - thetap;
-        if (dtheta < -pi)
-            dtheta += 2 * pi;
-        elseif (dtheta >= pi)
-            dtheta -= 2 * pi;
-        endif
-        
+        dtheta = wrapToPi(theta(k) - thetap);        
         dz = [ dr ; dtheta ];
         
         dz
