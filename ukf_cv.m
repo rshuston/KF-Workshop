@@ -1,4 +1,4 @@
-function [n, vn, e, ve, Pne] = ukf_cv(t, r, theta, var_p, var_r, var_theta)
+function [n, vn, e, ve, Pne] = ukf_cv(t, r, theta, P0, var_p, var_r, var_theta)
     n  = zeros(1, length(t));
     vn = zeros(1, length(t));
     e  = zeros(1, length(t));
@@ -11,10 +11,7 @@ function [n, vn, e, ve, Pne] = ukf_cv(t, r, theta, var_p, var_r, var_theta)
           0                    ;
           r(1) * sin(theta(1)) ;
           0                    ];
-    P = [1 , 0 , 0 , 0;
-         0 , 1 , 0 , 0;
-         0 , 0 , 1 , 0;
-         0 , 0 , 0 , 1];
+    P = P0;
     
     x
     P

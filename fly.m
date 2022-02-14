@@ -38,9 +38,14 @@ function fly(scenario)
 
     # Generate filtered data
 
-    [n_kf, vn_kf, e_kf, ve_kf, Pne_kf] = kf_cv(t, rz, thetaz, 0.1, 0.1, 0.1);
-    [n_ekf, vn_ekf, e_ekf, ve_ekf, Pne_ekf] = ekf_cv(t, rz, thetaz, 0.1, 0.1, 0.1);
-    [n_ukf, vn_ukf, e_ukf, ve_ukf, Pne_ukf] = ukf_cv(t, rz, thetaz, 0.1, 0.1, 0.1);
+    P0 = [ 1 , 0 , 0 , 0 ;
+           0 , 1 , 0 , 0 ;
+           0 , 0 , 1 , 0 ;
+           0 , 0 , 0 , 1 ];
+
+    [n_kf, vn_kf, e_kf, ve_kf, Pne_kf] = kf_cv(t, rz, thetaz, P0, 0.1, 0.1, 0.1);
+    [n_ekf, vn_ekf, e_ekf, ve_ekf, Pne_ekf] = ekf_cv(t, rz, thetaz, P0, 0.1, 0.1, 0.1);
+    [n_ukf, vn_ukf, e_ukf, ve_ukf, Pne_ukf] = ukf_cv(t, rz, thetaz, P0, 0.1, 0.1, 0.1);
 
     # Plot results
 
