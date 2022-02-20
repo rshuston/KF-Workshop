@@ -1,4 +1,4 @@
-function [n, vn, e, ve, Pne] = ukf_cv(t, r, theta, P0, var_p, var_r, var_theta)
+function [n, vn, e, ve, Pne] = ukf_cvdc(t, r, theta, P0, var_p, var_r, var_theta)
     n  = zeros(1, length(t));
     vn = zeros(1, length(t));
     e  = zeros(1, length(t));
@@ -24,7 +24,7 @@ function [n, vn, e, ve, Pne] = ukf_cv(t, r, theta, P0, var_p, var_r, var_theta)
     Pne{1} = P;
     
     N = 4;
-    M = 2;
+    M = 3;
     two_N_plus_1 = 2 * N + 1;
     alpha = 0.5;
     beta = 2;
@@ -43,13 +43,21 @@ function [n, vn, e, ve, Pne] = ukf_cv(t, r, theta, P0, var_p, var_r, var_theta)
     Wm0
     Wc0
     
-    R = [ var_r , 0         ;
-          0     , var_theta ];
-    
-    half_pi = pi / 2;
-    
     for k = 2:length(t)
         printf("########## k = \%d\n", k);
+        
+        cos_theta = cos(theta(k));
+        sin_theta = sin(theta(k));
+        
+        z_k = [ r(k)      ;
+                cos_theta ;
+                sin_theta ];
+        R_k = [ var_r , 0                                  , 0                                  ;
+                0     , var_theta * sin_theta * sin_theta  , -var_theta * sin_theta * cos_theta ;
+                0     , -var_theta * sin_theta * cos_theta , var_theta * cos_theta * cos_theta  ];
+        
+        z_k
+        R_k
         
         # Prediction
         
@@ -111,25 +119,26 @@ function [n, vn, e, ve, Pne] = ukf_cv(t, r, theta, P0, var_p, var_r, var_theta)
         Wc
         
         # Compute predicted measurement, saving intermediate results
-        theta_ref = atan2(xp(3), xp(1));
-        farside = (theta_ref > half_pi || theta_ref < -half_pi);
         
         zp = zeros(M,1);
         h_X = zeros(M, two_N_plus_1);
         for i = 1:two_N_plus_1
             X_i = X(:,i);
             Wm_i = Wm(i);
-            h_X_i = [ sqrt(X_i(1) * X_i(1) + X_i(3) * X_i(3)) ;
-                      atan2(X_i(3), X_i(1))                   ];
-            if (farside)
-                h_X_i(2) = wrapTo2Pi(h_X_i(2));
-            endif
+            rho_i = sqrt(X_i(1) * X_i(1) + X_i(3) * X_i(3));
+            h_X_i = [ rho_i          ;
+                      X_i(1) / rho_i ;
+                      X_i(3) / rho_i ];
             h_X(:,i) = h_X_i;
             zp += Wm_i * h_X_i;
         endfor
         
-        # Normalize angle
-        zp(2) = wrapToPi(zp(2));
+        # Normalize direction cosines adjusted from weighting
+        c = zp(2);
+        s = zp(3);
+        d = sqrt(c * c + s * s);
+        zp(2) = c / d;
+        zp(3) = s / d;
         
         h_X
         zp
@@ -145,7 +154,6 @@ function [n, vn, e, ve, Pne] = ukf_cv(t, r, theta, P0, var_p, var_r, var_theta)
             
             dx = X_i - xp;
             dz = h_X_i - zp;
-            dz(2) = wrapToPi(dz(2));
             
             Pxz += Wc_i * (dx * dz');
             Pzz += Wc_i * (dz * dz');
@@ -156,18 +164,14 @@ function [n, vn, e, ve, Pne] = ukf_cv(t, r, theta, P0, var_p, var_r, var_theta)
         
         # Correction
         
-        S = Pzz + R;
+        S = Pzz + R_k;
         K = Pxz * inv(S);
         
         S
         K
         
-        dr = r(k) - zp(1);
-        dtheta = wrapToPi(theta(k) - zp(2));
-        dz = [ dr ; dtheta ];
+        dz = z_k - zp;
         
-        r(k)
-        theta(k)
         dz
         
         x = xp + K * dz;

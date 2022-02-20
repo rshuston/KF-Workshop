@@ -33,6 +33,11 @@ function fly(scenario)
     thetaz = theta + 0.2 * 2 * (rand(1, length(t)) - 0.5);
     thetaz = wrapToPi(thetaz);
 
+    #####
+    #rz = r;
+    #thetaz = theta;
+    #####
+
     nz = rz .* cos(thetaz);
     ez = rz .* sin(thetaz);
 
@@ -46,6 +51,8 @@ function fly(scenario)
     [n_kf, vn_kf, e_kf, ve_kf, Pne_kf] = kf_cv(t, rz, thetaz, P0, 0.1, 0.1, 0.1);
     [n_ekf, vn_ekf, e_ekf, ve_ekf, Pne_ekf] = ekf_cv(t, rz, thetaz, P0, 0.1, 0.1, 0.1);
     [n_ukf, vn_ukf, e_ukf, ve_ukf, Pne_ukf] = ukf_cv(t, rz, thetaz, P0, 0.1, 0.1, 0.1);
+    
+    #[n_ukf, vn_ukf, e_ukf, ve_ukf, Pne_ukf] = ukf_cvdc(t, rz, thetaz, P0, 0.1, 0.1, 0.1);
 
     # Plot results
 

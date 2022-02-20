@@ -1,11 +1,11 @@
 #
-# Wraps X into the [-pi to pi] interval
+# Wraps X into the [-pi,  pi) interval
 #
 
 function xwrap = wrapToPi(x)
-    xwrap = rem (x, 2*pi);
-    idx = find (abs (xwrap) > pi);
-    xwrap(idx) -= 2*pi * sign (xwrap(idx));
+    xwrap = mod(x,2*pi);
+    idx = xwrap >= pi;
+    xwrap(idx) -= 2*pi;
 endfunction
 
 #
