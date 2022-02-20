@@ -1,4 +1,4 @@
-function [n, vn, e, ve, Pne] = ukf_cvdc(t, r, theta, P0, var_p, var_r, var_theta)
+function [n, vn, e, ve, Pne] = ukf_cvdc(t, r, theta, P0, var_p, var_r, var_dc)
     n  = zeros(1, length(t));
     vn = zeros(1, length(t));
     e  = zeros(1, length(t));
@@ -46,15 +46,14 @@ function [n, vn, e, ve, Pne] = ukf_cvdc(t, r, theta, P0, var_p, var_r, var_theta
     for k = 2:length(t)
         printf("########## k = \%d\n", k);
         
-        cos_theta = cos(theta(k));
-        sin_theta = sin(theta(k));
-        
         z_k = [ r(k)      ;
-                cos_theta ;
-                sin_theta ];
-        R_k = [ var_r , 0                                  , 0                                  ;
-                0     , var_theta * sin_theta * sin_theta  , -var_theta * sin_theta * cos_theta ;
-                0     , -var_theta * sin_theta * cos_theta , var_theta * cos_theta * cos_theta  ];
+                cos(theta(k)) ;
+                sin(theta(k)) ];
+        
+        # Heuristic covariance, but numerically behaved
+        R_k = [ var_r , 0      , 0      ;
+                0     , var_dc , 0      ;
+                0     , 0      , var_dc ];
         
         z_k
         R_k
