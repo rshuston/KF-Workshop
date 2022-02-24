@@ -50,6 +50,7 @@ function fly(scenario)
     
     [n_kf, vn_kf, e_kf, ve_kf, Pne_kf] = kf_cv(t, rz, thetaz, P0, 0.1, 0.1, 0.1);
     [n_ekf, vn_ekf, e_ekf, ve_ekf, Pne_ekf] = ekf_cv(t, rz, thetaz, P0, 0.1, 0.1, 0.1);
+    #[n_ekf_dc, vn_ekf_dc, e_ekf_dc, ve_ekf_dc, Pne_ekf_dc] = ekf_cvdc(t, rz, thetaz, P0, 0.1, 0.1, 0.25);
     [n_ukf, vn_ukf, e_ukf, ve_ukf, Pne_ukf] = ukf_cv(t, rz, thetaz, P0, 0.1, 0.1, 0.1);
     [n_ukf_dc, vn_ukf_dc, e_ukf_dc, ve_ukf_dc, Pne_ukf_dc] = ukf_cvdc(t, rz, thetaz, P0, 0.1, 0.1, 0.25);
     
@@ -57,6 +58,7 @@ function fly(scenario)
     
     plot_results("KF", t, n, e, r, theta, nz, ez, rz, thetaz, n_kf, vn_kf, e_kf, ve_kf, Pne_kf);
     plot_results("EKF", t, n, e, r, theta, nz, ez, rz, thetaz, n_ekf, vn_ekf, e_ekf, ve_ekf, Pne_ekf);
+    #plot_results("EKF-DC", t, n, e, r, theta, nz, ez, rz, thetaz, n_ekf_dc, vn_ekf_dc, e_ekf_dc, ve_ekf_dc, Pne_ekf_dc);
     plot_results("UKF", t, n, e, r, theta, nz, ez, rz, thetaz, n_ukf, vn_ukf, e_ukf, ve_ukf, Pne_ukf);
     plot_results("UKF-DC", t, n, e, r, theta, nz, ez, rz, thetaz, n_ukf_dc, vn_ukf_dc, e_ukf_dc, ve_ukf_dc, Pne_ukf_dc);
     
