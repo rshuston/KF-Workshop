@@ -5,6 +5,7 @@ A workspace to explore various Kalman Filtering techniques.
 The following filter types are explored:
 - Kalman Filter, Transformed Range and Bearing Measurements
 - Extended Kalman Filter, Range and Bearing Measurements
+- Extended Kalman Filter, Range and Direction Cosine Measurements
 - Unscented Kalman Filter, Range and Bearing Measurements
 - Unscented Kalman Filter, Range and Direction Cosine Measurements
 

@@ -74,8 +74,15 @@ function [n, vn, e, ve, Pne] = ekf_cvdc(t, r, theta, P0, var_p, var_r, var_dc)
         zp = [ rp         ;
                xp(1) / rp ;
                xp(3) / rp ];
+               
+        # Normalize direction cosines adjusted from roundoff
+        c = zp(2);
+        s = zp(3);
+        d = sqrt(c * c + s * s);
+        zp(2) = c / d;
+        zp(3) = s / d;
         
-        zp;
+        zp
         
         dz = z_k - zp;
         

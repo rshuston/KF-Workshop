@@ -22,7 +22,12 @@ theta
 nz
 ez
 
-[nf, vnf, ef, vef, Pnef] = kf_cv(t, r, theta, 1, 1, 1);
+P0 = [ 1 , 0 , 0 , 0 ;
+       0 , 1 , 0 , 0 ;
+       0 , 0 , 1 , 0 ;
+       0 , 0 , 0 , 1 ];
+
+[nf, vnf, ef, vef, Pnef] = kf_cv(t, r, theta, P0, 1, 1, 1);
 
 nf
 ef
