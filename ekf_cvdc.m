@@ -102,7 +102,7 @@ function [n, vn, e, ve, Pne] = ekf_cvdc(t, r, theta, P0, var_p, var_r, var_dc)
         K
         
         x = xp + K * dz;
-        P = (eye(4) - K * H) * Pp;
+        P = Pp - K * S * K';
         
         x
         P

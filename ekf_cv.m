@@ -85,7 +85,7 @@ function [n, vn, e, ve, Pne] = ekf_cv(t, r, theta, P0, var_p, var_r, var_theta)
         K
         
         x = xp + K * dz;
-        P = (eye(4) - K * H) * Pp;
+        P = Pp - K * S * K';
         
         x
         P
