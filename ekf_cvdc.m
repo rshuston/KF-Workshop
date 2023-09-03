@@ -1,3 +1,6 @@
+# This version of the EKF uses direction cosine angle measurements so that we
+# can easily handle angles crossing the [-pi, pi) boundary.
+
 function [n, vn, e, ve, Pne] = ekf_cvdc(t, r, theta, P0, var_p, var_r, var_dc)
     n  = zeros(1, length(t));
     vn = zeros(1, length(t));

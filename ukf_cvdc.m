@@ -1,3 +1,8 @@
+# This version of the UKF only approximates the measurement relation, and uses
+# different weights for mean (Wm) and covariance (Wc) sums. It uses direction
+# cosine angle measurements so that we can easily handle angles crossing the
+# [-pi, pi) boundary.
+
 function [n, vn, e, ve, Pne] = ukf_cvdc(t, r, theta, P0, var_p, var_r, var_dc)
     n  = zeros(1, length(t));
     vn = zeros(1, length(t));
@@ -42,6 +47,19 @@ function [n, vn, e, ve, Pne] = ukf_cvdc(t, r, theta, P0, var_p, var_r, var_dc)
     sqrt_N_plus_lambda
     Wm0
     Wc0
+    Wi
+    
+    Wm = zeros(1,two_N_plus_1);
+    Wc = zeros(1,two_N_plus_1);
+    Wm(1) = Wm0;
+    Wc(1) = Wc0;
+    for i = 2:two_N_plus_1
+        Wm(i) = Wi;
+        Wc(i) = Wi;
+    endfor
+    
+    Wm
+    Wc
     
     for k = 2:length(t)
         printf("########## k = \%d\n", k);
@@ -104,18 +122,6 @@ function [n, vn, e, ve, Pne] = ukf_cvdc(t, r, theta, P0, var_p, var_r, var_dc)
         endfor
         
         X
-        
-        Wm = zeros(1,two_N_plus_1);
-        Wc = zeros(1,two_N_plus_1);
-        Wm(1) = Wm0;
-        Wc(1) = Wc0;
-        for i = 2:two_N_plus_1
-            Wm(i) = Wi;
-            Wc(i) = Wi;
-        endfor
-        
-        Wm
-        Wc
         
         # Compute predicted measurement, saving intermediate results
         

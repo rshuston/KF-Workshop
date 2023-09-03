@@ -1,3 +1,6 @@
+# This version of the EKF manually accounts for angles crossing the
+# [-pi, pi) boundary.
+
 function [n, vn, e, ve, Pne] = ekf_cv(t, r, theta, P0, var_p, var_r, var_theta)
     n  = zeros(1, length(t));
     vn = zeros(1, length(t));
