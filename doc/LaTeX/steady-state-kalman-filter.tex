@@ -1,0 +1,113 @@
+\section{The Steady-State Form of the Kalman Filter}
+\label{The Steady-State Form of the Kalman Filter}
+
+Recall the Kalman filter equations that describe the evolution of the state estimation
+error covariance from $\mathbf{P}_{k-1}$ to $\mathbf{P}_k$:
+
+\begin{equation*}
+    \begin{aligned}
+        & \mathbf{P}_{k|k-1} = \mathbf{\Phi}_{k|k-1} \mathbf{P}_{k-1} \mathbf{\Phi}_{k|k-1}^T + \mathbf{\Gamma}_{k|k-1} \mathbf{Q}_{k-1} \mathbf{\Gamma}_{k|k-1}^T \\
+        & \mathbf{S}_{k} = \mathbf{H}_k \mathbf{P}_{k|k-1} \mathbf{H}_k^T + \mathbf{R}_k \\
+        & \mathbf{K}_{k} = \mathbf{P}_{k|k-1} \mathbf{H}_{k}^T \mathbf{S}_k^{-1} \\
+        & \mathbf{P}_k = \mathbf{P}_{k|k-1} - \mathbf{K}_{k} \, \mathbf{S}_{k} \, \mathbf{K}_{k}^T
+    \end{aligned}
+\end{equation*}
+
+Observe that the update of $\mathbf{P}_k$ is independent of the observation $\mathbf{z}_k$.
+In contrast to the update cycle for $\hat{\mathbf{x}}_k$, the update cycle for $\mathbf{P}_k$
+is performed in isolation; it has no “error feedback” operation as does the update cycle
+for $\hat{\mathbf{x}}_k$ via the $\tilde{\mathbf{z}}_k = \mathbf{z}_k - \hat{\mathbf{z}}_k$
+term.
+
+Consider the unforced linear dynamic process model where the state transition matrix,
+$\mathbf{\Phi}$, and the observation connection matrix, $\mathbf{H}$, are constant, and
+where the process noise connection matrix is $\mathbf{\Gamma} =  \mathbf{I}$:
+
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{x}_{k+1} &= \mathbf{\Phi} \mathbf{x}_k + \mathbf{w}_k \\
+        \mathbf{z}_k &= \mathbf{H} \mathbf{x}_k + \mathbf{v}_k
+    \end{aligned}
+\end{equation*}
+
+Furthermore, assume the process noise covariance, $\mathbf{Q}$, and observation noise
+covariance, $\mathbf{R}$, are constant as well. Then the state estimation error covariance
+update cycle for this dynamical system is
+
+\begin{equation*}
+    \begin{aligned}
+        & \mathbf{P}_{k|k-1} = \mathbf{\Phi} \mathbf{P}_{k-1} \mathbf{\Phi}^T + \mathbf{Q} \\
+        & \mathbf{S}_{k} = \mathbf{H} \mathbf{P}_{k|k-1} \mathbf{H}^T + \mathbf{R} \\
+        & \mathbf{K}_{k} = \mathbf{P}_{k|k-1} \mathbf{H}^T \mathbf{S}_k^{-1} \\
+        & \mathbf{P}_k = \mathbf{P}_{k|k-1} - \mathbf{K}_{k} \, \mathbf{S}_{k} \, \mathbf{K}_{k}^T
+    \end{aligned}
+\end{equation*}
+
+Next, consider the $k+1$ prediction form of the state estimation error covariance:
+
+\begin{equation*}
+    \mathbf{P}_{k+1|k} = \mathbf{\Phi} \mathbf{P}_{k} \mathbf{\Phi}^T + \mathbf{Q}
+\end{equation*}
+
+Inserting the terms from the $\mathbf{P}_{k-1}$ to $\mathbf{P}_k$ covariance update cycle,
+and remembering that $\mathbf{P}$ and $\mathbf{S}$ are symmetric, we obtain
+
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{P}_{k+1|k} &= \mathbf{\Phi} \mathbf{P}_{k} \mathbf{\Phi}^T + \mathbf{Q} \\
+        &= \mathbf{\Phi} \left[ \mathbf{P}_{k|k-1} - \mathbf{K}_{k} \mathbf{S}_{k} \mathbf{K}_{k}^T \right] \mathbf{\Phi}^T + \mathbf{Q} \\
+        &= \mathbf{\Phi} \mathbf{P}_{k|k-1} \mathbf{\Phi}^T - \mathbf{\Phi} \mathbf{P}_{k|k-1} \mathbf{H}^T \mathbf{S}_k^{-1} \mathbf{S}_{k} \mathbf{S}_k^{-1} \mathbf{H} \mathbf{P}_{k|k-1} \mathbf{\Phi}^T + \mathbf{Q} \\
+        &= \mathbf{\Phi} \mathbf{P}_{k|k-1} \mathbf{\Phi}^T - \mathbf{\Phi} \mathbf{P}_{k|k-1} \mathbf{H}^T \mathbf{S}_k^{-1} \mathbf{H} \mathbf{P}_{k|k-1} \mathbf{\Phi}^T + \mathbf{Q} \\
+        &= \mathbf{\Phi} \mathbf{P}_{k|k-1} \mathbf{\Phi}^T - \mathbf{\Phi} \mathbf{P}_{k|k-1} \mathbf{H}^T \left[ \mathbf{H} \mathbf{P}_{k|k-1} \mathbf{H}^T + \mathbf{R} \right]^{-1} \mathbf{H} \mathbf{P}_{k|k-1} \mathbf{\Phi}^T + \mathbf{Q}
+    \end{aligned}
+\end{equation*}
+
+The equation
+
+\boxed{
+\parbox{\textwidth}{
+\begin{equation}
+    \mathbf{P}_{k+1|k} = \mathbf{\Phi} \mathbf{P}_{k|k-1} \mathbf{\Phi}^T
+    - \mathbf{\Phi} \mathbf{P}_{k|k-1} \mathbf{H}^T \left[ \mathbf{H} \mathbf{P}_{k|k-1} \mathbf{H}^T + \mathbf{R} \right]^{-1} \mathbf{H} \mathbf{P}_{k|k-1} \mathbf{\Phi}^T + \mathbf{Q}
+    \label{eq:discrete-time-riccati-equation}
+\end{equation}
+}
+}
+
+is a \textit{discrete-time Riccati equation}. Considerable analysis and literature has
+been devoted to the solution of the Riccati recurrence relation. While a closed form
+solution to the Riccati equation can be difficult to obtain, for the constant-matrix
+linear dynamic process model, the state error covariance converges to a steady-state
+value, $\mathbf{P}_{\infty}$, and a numerical solution is quite practical, iterating
+over $k \ge 0$ until $\mathbf{P}_{k+1|k}$ converges to a steady-state value, starting
+the iterations with $\mathbf{P}_{0|-1} = \mathbf{P}_0$.
+
+Given a steady-state covariance value of $\mathbf{P}_{\infty}$, we can obtain a
+steady-state Kalman gain $\mathbf{K}_{\infty}$ using the information Kalman filter gain
+equation (\ref{eq:kalman-gain-from-information-matrix}):
+
+\begin{equation*}
+    \mathbf{K}_{\infty} = \mathbf{P}_{\infty} \mathbf{H}^T \mathbf{R}^{-1}
+\end{equation*}
+
+The steady-state form of the Kalman filter is then
+
+I. Projection (\textit{a priori}) update:
+
+\begin{equation*}
+    \hat{\mathbf{x}}_{k|k-1} = \mathbf{\Phi} \hat{\mathbf{x}}_{k-1}
+\end{equation*}
+
+II. Correction (\textit{a posteriori}) update:
+
+\begin{equation*}
+    \begin{aligned}
+        \hat{\mathbf{z}}_k &= \mathbf{H} \hat{\mathbf{x}}_{k|k-1} \\
+        \tilde{\mathbf{z}}_k &= \mathbf{z}_k - \hat{\mathbf{z}}_k \\
+        \hat{\mathbf{x}}_k &= \hat{\mathbf{x}}_{k|k-1} +\mathbf{K}_{\infty} \, \tilde{\mathbf{z}}_k
+    \end{aligned}
+\end{equation*}
+
+The steady-state Kalman filter can be useful in certain applications where processing
+resources are limited and a fixed-gain solution is deemed sufficient for the application.
+

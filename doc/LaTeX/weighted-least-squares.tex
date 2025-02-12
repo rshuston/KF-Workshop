@@ -1,0 +1,326 @@
+\section{Weighted Least-Squares Estimation}
+\label{Weighted Least-Squares Estimation}
+
+Consider the overdetermined observation system
+
+\begin{equation*}
+    \mathbf{z} = \mathbf{H} \mathbf{x} + \mathbf{v}
+\end{equation*}
+
+where $\mathbf{z}$ is an $m \times 1$ observation vector,
+$\mathbf{x}$ is an $m \times 1$ state vector,
+$\mathbf{H}$ is an $m \times n$ observation matrix,
+and $\mathbf{v}$ is an $m \times 1$ random vector of observation errors with covariance
+
+\begin{equation*}
+    E \left\{ \mathbf{v} \mathbf{v}^T \right\} = \mathbf{R}
+\end{equation*}
+
+As stated previously, $m \ge n$, i.e., there can be more observations than there are states.
+So $\mathbf{H}$ is not necessarily square:
+
+\begin{equation*}
+    \begin{bmatrix}
+    z_1 \\
+    z_2 \\
+    z_3 \\
+    z_4 \\
+    z_5 \\
+    \vdots \\
+    z_m
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+    h_{11} & h_{12} & h_{13} & \dots & h_{1n} \\
+    h_{21} & h_{22} & h_{23} & \dots & h_{2n} \\
+    h_{31} & h_{32} & h_{33} & \dots & h_{3n} \\
+    h_{41} & h_{42} & h_{43} & \dots & h_{4n} \\
+    h_{51} & h_{52} & h_{53} & \dots & h_{5n} \\
+    \vdots & \vdots & \vdots & \ddots & \vdots \\
+    h_{m1} & h_{m2} & h_{m3} & \dots & h_{mn}
+    \end{bmatrix}
+    \begin{bmatrix}
+    x_1 \\
+    x_2 \\
+    x_3 \\
+    \vdots \\
+    x_n
+    \end{bmatrix}
+    +
+    \begin{bmatrix}
+    v_1 \\
+    v_2 \\
+    v_3 \\
+    v_4 \\
+    v_5 \\
+    \vdots \\
+    v_m
+    \end{bmatrix}
+\end{equation*}
+
+Assume that we already have a state estimate, $\hat{\mathbf{x}}$. We can then determine the
+corresponding observation estimate, $\hat{\mathbf{z}}$, from
+
+\begin{equation*}
+    \hat{\mathbf{z}} = \mathbf{H} \hat{\mathbf{x}}
+\end{equation*}
+
+We form the observation residual, i.e., the observation error
+
+\begin{equation*}
+    \tilde{\mathbf{z}} = \mathbf{z} - \hat{\mathbf{z}}
+\end{equation*}
+
+We can then form the weighted squared error term
+
+\begin{equation*}
+    \epsilon^2 = \tilde{\mathbf{z}}^T \mathbf{W} \tilde{\mathbf{z}}
+\end{equation*}
+
+where $\mathbf{W}$ is an arbitrary symmetric weighting matrix.
+
+The objective is to determine the "best" value for $\hat{\mathbf{x}}$ that fits the
+observation data $\mathbf{z}$. We will define "best" to be the value of $\hat{\mathbf{x}}$
+that minimizes $\epsilon^2$. In other words, we want to find the "least-squares"
+estimate of $\mathbf{x}$.
+
+Expanding the terms of $\epsilon^2$ gives
+
+\begin{equation*}
+    \begin{aligned}
+        \epsilon^2 &= \tilde{\mathbf{z}}^T \mathbf{W} \tilde{\mathbf{z}} \\
+                   &= \left[ \mathbf{z} - \hat{\mathbf{z}} \right]^T \mathbf{W} \left[ \mathbf{z} - \hat{\mathbf{z}} \right] \\
+                   &= \left[ \mathbf{z} - \mathbf{H} \hat{\mathbf{x}} \right]^T \mathbf{W} \left[ \mathbf{z} - \mathbf{H} \hat{\mathbf{x}} \right] \\
+                   &= \left[ \mathbf{z}^T - \hat{\mathbf{x}}^T \mathbf{H}^T \right] \mathbf{W} \left[ \mathbf{z} - \mathbf{H} \hat{\mathbf{x}} \right] \\
+                   &= \mathbf{z}^T \mathbf{W} \mathbf{z} - \hat{\mathbf{x}}^T \mathbf{H}^T \mathbf{W} \mathbf{z}
+                      - \mathbf{z}^T \mathbf{W} \mathbf{H} \hat{\mathbf{x}} + \hat{\mathbf{x}}^T \mathbf{H}^T \mathbf{W} \mathbf{H} \hat{\mathbf{x}}
+    \end{aligned}
+\end{equation*}
+
+To find the value of $\hat{\mathbf{x}}$ that minimizes $\epsilon^2$, we differentiate 
+$\epsilon^2$ with respect to $\hat{\mathbf{x}}$ and set the resulting expression to zero.
+We can make use of the following differentiation formulas:
+
+\begin{equation*}
+    \frac{ d \left( \mathbf{a}^T \mathbf{x} \right) }{d \mathbf{x}} = \frac{ d \left( \mathbf{x}^T \mathbf{a} \right) }{d \mathbf{x}} = \mathbf{a}
+\end{equation*}
+
+\begin{equation*}
+    \frac{ d \left( \mathbf{x}^T \mathbf{A} \mathbf{x} \right) }{d \mathbf{x}} = 2 \mathbf{A} \mathbf{x} \, , \phantom{X} (\mathbf{A} \, \mathrm{is} \, \mathrm{symmetric})
+\end{equation*}
+
+We use the differential operation where, if $s$ is a scalar value and $\mathbf{x}$ is a
+column vector value, then
+
+\begin{equation*}
+    \frac {d s} {d \mathbf{x}} \triangleq
+    \begin{bmatrix}
+    \dfrac{\partial s}{\partial x_{1}} \\
+    \phantom{.} \\
+    \dfrac{\partial s}{\partial x_{2}} \\
+    \phantom{.} \\
+    \dfrac{\partial s}{\partial x_{3}} \\
+    \phantom{.} \\
+    \vdots
+    \end{bmatrix}
+\end{equation*}
+
+Then
+
+\begin{equation*}
+    \begin{aligned}
+        \frac{ d \left( \epsilon^2 \right) }{d \hat{\mathbf{x}}}
+        &= - \mathbf{H}^T \mathbf{W} \mathbf{z}
+           - \left( \mathbf{z}^T \mathbf{W} \mathbf{H} \right)^T
+           + 2 \mathbf{H}^T \mathbf{W} \mathbf{H} \hat{\mathbf{x}} \\
+        &= \mathbf{0}
+    \end{aligned}
+\end{equation*}
+
+and so, observing that $\mathbf{H}^T \mathbf{W} \mathbf{H}$ is invertible, we see that
+
+\begin{equation*}
+    \begin{aligned}
+        - \mathbf{H}^T \mathbf{W} \mathbf{z}
+        -  \left( \mathbf{z}^T \mathbf{W} \mathbf{H} \right)^T
+        + 2 \mathbf{H}^T \mathbf{W} \mathbf{H} \hat{\mathbf{x}}
+        &= \mathbf{0} \\
+        - \mathbf{H}^T \mathbf{W} \mathbf{z}
+        - \mathbf{H}^T \mathbf{W} \mathbf{z}
+        + 2 \mathbf{H}^T \mathbf{W} \mathbf{H} \hat{\mathbf{x}}
+        &= \mathbf{0} \\
+        - 2 \mathbf{H}^T \mathbf{W} \mathbf{z}
+        + 2 \mathbf{H}^T \mathbf{W} \mathbf{H} \hat{\mathbf{x}}
+        &= \mathbf{0} \\
+        \mathbf{H}^T \mathbf{W} \mathbf{H} \hat{\mathbf{x}} &= \mathbf{H}^T \mathbf{W} \mathbf{z} \\
+        \hat{\mathbf{x}} &= \left( \mathbf{H}^T \mathbf{W} \mathbf{H} \right)^{-1} \mathbf{H}^T \mathbf{W} \mathbf{z} \\
+    \end{aligned}
+\end{equation*}
+
+Hence the "best" value of $\hat{\mathbf{x}}$ that fits the observation data $\mathbf{z}$
+in the least-squares sense is
+
+\boxed{
+\parbox{\textwidth}{
+\begin{equation}
+    \hat{\mathbf{x}} = \left( \mathbf{H}^T \mathbf{W} \mathbf{H} \right)^{-1} \mathbf{H}^T \mathbf{W} \mathbf{z}
+\end{equation}
+}
+}
+
+To find the optimal value of $\mathbf{W}$, we form the state estimation error
+
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{e} &= \mathbf{x} - \hat{\mathbf{x}} \\
+        &= \mathbf{x} - \left( \mathbf{H}^T \mathbf{W} \mathbf{H} \right)^{-1} \mathbf{H}^T \mathbf{W} \mathbf{z} \\
+        &= \mathbf{x} - \left( \mathbf{H}^T \mathbf{W} \mathbf{H} \right)^{-1} \mathbf{H}^T \mathbf{W} \left[ \mathbf{H} \mathbf{x} + \mathbf{v} \right] \\
+        &= \mathbf{x}
+           - \left( \mathbf{H}^T \mathbf{W} \mathbf{H} \right)^{-1} \mathbf{H}^T \mathbf{W} \mathbf{H} \mathbf{x}
+           - \left( \mathbf{H}^T \mathbf{W} \mathbf{H} \right)^{-1} \mathbf{H}^T \mathbf{W} \mathbf{v} \\
+        &= \mathbf{x} - \mathbf{x}
+           - \left( \mathbf{H}^T \mathbf{W} \mathbf{H} \right)^{-1} \mathbf{H}^T \mathbf{W} \mathbf{v} \\
+        &= - \left( \mathbf{H}^T \mathbf{W} \mathbf{H} \right)^{-1} \mathbf{H}^T \mathbf{W} \mathbf{v} \\
+    \end{aligned}
+\end{equation*}
+
+Then the covariance of the state estimation error is
+
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{P} &= E \left\{ \mathbf{e} \, \mathbf{e}^T \right\} \\
+        &= E \left\{ \left[ - \left( \mathbf{H}^T \mathbf{W} \mathbf{H} \right)^{-1} \mathbf{H}^T \mathbf{W} \mathbf{v} \right]
+           \left[ - \left( \mathbf{H}^T \mathbf{W} \mathbf{H} \right)^{-1} \mathbf{H}^T \mathbf{W} \mathbf{v} \right]^T \right\} \\
+        &= E \left\{ \left[ - \left( \mathbf{H}^T \mathbf{W} \mathbf{H} \right)^{-1} \mathbf{H}^T \mathbf{W} \mathbf{v} \right]
+           \left[ - \mathbf{v}^T \mathbf{W} \mathbf{H} \left( \mathbf{H}^T \mathbf{W} \mathbf{H} \right)^{-1} \right] \right\} \\
+        &= E \left\{ \left( \mathbf{H}^T \mathbf{W} \mathbf{H} \right)^{-1} \mathbf{H}^T \mathbf{W} \mathbf{v}
+           \mathbf{v}^T \mathbf{W} \mathbf{H} \left( \mathbf{H}^T \mathbf{W} \mathbf{H} \right)^{-1} \right\} \\
+        &= \left( \mathbf{H}^T \mathbf{W} \mathbf{H} \right)^{-1} \mathbf{H}^T \mathbf{W}
+           \;\, E \left\{ \mathbf{v} \mathbf{v}^T \right\} \;
+           \mathbf{W} \mathbf{H} \left( \mathbf{H}^T \mathbf{W} \mathbf{H} \right)^{-1} \\
+        &= \left( \mathbf{H}^T \mathbf{W} \mathbf{H} \right)^{-1} \mathbf{H}^T \mathbf{W}
+           \mathbf{R}
+           \mathbf{W} \mathbf{H} \left( \mathbf{H}^T \mathbf{W} \mathbf{H} \right)^{-1} \\
+    \end{aligned}
+\end{equation*}
+
+In order to simplify this expression, we set $\mathbf{R} = \mathbf{W}^{-1}$. Then
+
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{P}
+        &= \left( \mathbf{H}^T \mathbf{W} \mathbf{H} \right)^{-1}
+           \mathbf{H}^T \mathbf{W} \mathbf{R} \mathbf{W} \mathbf{H}
+           \left( \mathbf{H}^T \mathbf{W} \mathbf{H} \right)^{-1} \\
+        &= \left( \mathbf{H}^T \mathbf{W} \mathbf{H} \right)^{-1}
+           \mathbf{H}^T \mathbf{W} \mathbf{W}^{-1} \mathbf{W} \mathbf{H}
+           \left( \mathbf{H}^T \mathbf{W} \mathbf{H} \right)^{-1} \\
+        &= \left( \mathbf{H}^T \mathbf{W} \mathbf{H} \right)^{-1}
+           \mathbf{H}^T \mathbf{W} \mathbf{H}
+           \left( \mathbf{H}^T \mathbf{W} \mathbf{H} \right)^{-1} \\
+        &= \left( \mathbf{H}^T \mathbf{W} \mathbf{H} \right)^{-1}  \\
+    \end{aligned}
+\end{equation*}
+
+Hence, the optimal value for $\mathbf{W}$ is
+
+\boxed{
+\parbox{\textwidth}{
+\begin{equation}
+    \mathbf{W} = \mathbf{R}^{-1}
+\end{equation}
+}
+}
+
+Note that the least-squares solution only uses information from the observation
+description. It has no knowledge of the system state dynamics.
+
+Let us now consider the unweighted ($\mathbf{W} = \mathbf{I}$) least-squares solution
+
+\begin{equation*}
+    \hat{\mathbf{x}} = \left( \mathbf{H}^T \mathbf{H} \right)^{-1} \mathbf{H}^T \mathbf{z}
+\end{equation*}
+
+Define
+
+\begin{equation*}
+    \mathbf{A} = \left( \mathbf{H}^T \mathbf{H} \right)^{-1} \mathbf{H}^T
+\end{equation*}
+
+so that
+
+\begin{equation*}
+    \hat{\mathbf{x}} = \mathbf{A} \mathbf{z}
+\end{equation*}
+
+If, for the moment, let us treat the vector $\mathbf{z}$ as a zero-mean Gaussian random
+vector with unit noise covariance,
+
+\begin{equation*}
+    E \left\{ \mathbf{z} \, \mathbf{z}^T \right\} = \mathbf{I}
+\end{equation*}
+
+then, because the solution for $\hat{\mathbf{x}}$ is a linear transformation on
+$\mathbf{z}$, the covariance of $\hat{\mathbf{x}}$ is then
+
+\begin{equation*}
+    \begin{aligned}
+        E \left\{ \hat{\mathbf{x}} \, \hat{\mathbf{x}}^T \right\} &= E \left\{ \left[ \mathbf{A} \mathbf{z} \right] \left[ \mathbf{A} \mathbf{z} \right]^T \right\} \\
+        &= E \left\{ \left[ \mathbf{A} \mathbf{z} \right] \left[ \mathbf{z}^T \mathbf{A}^T \right] \right\} \\
+        &= E \left\{ \mathbf{A} \mathbf{z} \, \mathbf{z}^T \mathbf{A}^T \right\} \\
+        &= \mathbf{A} E \left\{ \mathbf{z} \, \mathbf{z}^T \right\} \mathbf{A}^T \\
+        &= \mathbf{A} \mathbf{A}^T
+    \end{aligned}
+\end{equation*}
+
+Substituting the expansion for $\mathbf{A}$ into
+$E \left\{ \hat{\mathbf{x}} \, \hat{\mathbf{x}}^T \right\}$ gives
+
+\begin{equation*}
+    \begin{aligned}
+        E \left\{ \hat{\mathbf{x}} \, \hat{\mathbf{x}}^T \right\} &= \mathbf{A} \mathbf{A}^T \\
+        &= \left[ \left( \mathbf{H}^T \mathbf{H} \right)^{-1} \mathbf{H}^T \right] \left[ \left( \mathbf{H}^T \mathbf{H} \right)^{-1} \mathbf{H}^T \right]^T \\
+        &= \left[ \left( \mathbf{H}^T \mathbf{H} \right)^{-1} \mathbf{H}^T \right] \left[ \mathbf{H} \left( \left( \mathbf{H}^T \mathbf{H} \right)^{-1} \right)^T \right] \\
+        &= \left[ \left( \mathbf{H}^T \mathbf{H} \right)^{-1} \mathbf{H}^T \right] \left[ \mathbf{H} \left( \left( \mathbf{H}^T \mathbf{H} \right)^T \right)^{-1} \right] \\
+        &= \left[ \left( \mathbf{H}^T \mathbf{H} \right)^{-1} \mathbf{H}^T \right] \left[ \mathbf{H} \left( \mathbf{H}^T \mathbf{H} \right)^{-1} \right] \\
+        &= \left( \mathbf{H}^T \mathbf{H} \right)^{-1} \mathbf{H}^T \mathbf{H} \left( \mathbf{H}^T \mathbf{H} \right)^{-1} \\
+        &= \left( \mathbf{H}^T \mathbf{H} \right)^{-1} \left( \mathbf{H}^T \mathbf{H} \right) \left( \mathbf{H}^T \mathbf{H} \right)^{-1} \\
+        &= \left( \mathbf{H}^T \mathbf{H} \right)^{-1}
+    \end{aligned}
+\end{equation*}
+
+Note that this is identical to the unweighted ($\mathbf{W} = \mathbf{I}$) expression for
+the state estimation error covariance, $\mathbf{P}$, with $\mathbf{R} = \mathbf{I}$:
+
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{P} &= E \left\{ \mathbf{e} \, \mathbf{e}^T \right\} \\
+        &= \left( \mathbf{H}^T \mathbf{W} \mathbf{H} \right)^{-1} \mathbf{H}^T \mathbf{W}
+           \mathbf{R}
+           \mathbf{W} \mathbf{H} \left( \mathbf{H}^T \mathbf{W} \mathbf{H} \right)^{-1} \\
+        &= \left( \mathbf{H}^T \mathbf{H} \right)^{-1} \mathbf{H}^T \mathbf{H} \left( \mathbf{H}^T \mathbf{H} \right)^{-1} \\
+        &= \left( \mathbf{H}^T \mathbf{H} \right)^{-1}
+    \end{aligned}
+\end{equation*}
+
+In navigation applications, $\mathbf{H}$ is a geometric transformation from navigation
+coordinates, $\mathbf{x}$, to their observation coordinates, $\mathbf{z}$. A parameter
+known as the Geometric Dilution of Precision (GDOP) is an indicator of the goodness of
+fit of the navigation solution, $\hat{\mathbf{x}}$. The GDOP is based on the above
+covariance relation for $E \left\{ \hat{\mathbf{x}} \, \hat{\mathbf{x}}^T \right\}$,
+since smaller covariance values indicate a solution that exhibits less dispersion. The
+GDOP is defined as
+
+\begin{equation*}
+    \begin{aligned}
+        \mathrm{GDOP} &= \sqrt{ \, \mathrm{tr} \left( E \left\{ \hat{\mathbf{x}} \, \hat{\mathbf{x}}^T \right\} \right) } \\
+                      &= \sqrt{ \, \mathrm{tr} \left( \left( \mathbf{H}^T \mathbf{H} \right)^{-1} \right) }
+    \end{aligned}
+\end{equation*}
+
+The GDOP is a measure of the precision of the navigation solution, $\hat{\mathbf{x}}$.
+A low GDOP value indicates a high confidence in the precision of the solution, and vice
+versa. Also, observe that the GDOP is based only on $\mathbf{H}$; it does not require
+the existence of observations, $\mathbf{z}$, or the determination of a solution,
+$\hat{\mathbf{x}}$. Hence, one can compute the GDOP of different geometric conditions
+as a way to optimize the selection of signaling sources to be used for navigating.

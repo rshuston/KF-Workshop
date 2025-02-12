@@ -1,0 +1,919 @@
+\section{The Kalman Filter}
+\label{The Kalman Filter}
+
+We begin with the unforced linear system dynamical process model
+
+\begin{equation}
+    \mathbf{x}_{k+1} = \mathbf{\Phi}_{k+1|k} \mathbf{x}_k + \mathbf{\Gamma}_{k+1|k} \mathbf{w}_k
+    \label{eq:unforced-linear-system-dynamical-model}
+\end{equation}
+
+where $\mathbf{x}$ is an $n \times 1$ state vector,
+$\mathbf{\Phi}$ is an $n \times n$ state transition matrix,
+$\mathbf{\Gamma}$ is an $n \times p$ disturbance distribution matrix,
+and $\mathbf{w}$ is a $p \times 1$ white process noise sequence of random disturbances with covariance
+
+\begin{equation}
+    E \left\{ \mathbf{w}_k \mathbf{w}_k^T \right\} = \mathbf{Q}_k
+    \label{eq:process-noise-covariance}
+\end{equation}
+
+We also have a linear observation model
+
+\begin{equation}
+    \mathbf{z}_k = \mathbf{H}_k \mathbf{x}_k + \mathbf{v}_k
+    \label{eq:linear-system-observation-model}
+\end{equation}
+
+and where $\mathbf{z}$ is an $m \times 1$ observation vector,
+$\mathbf{H}$ is an $m \times n$ observation transformation matrix,
+and $\mathbf{v}_k$ is an $m \times 1$ white error noise sequence of random observation errors with covariance
+
+\begin{equation}
+    E \left\{ \mathbf{v}_k \mathbf{v}_k^T \right\} = \mathbf{R}_k
+    \label{eq:observation-noise-covariance}
+\end{equation}
+
+The process and observation noise sequences are uncorrelated
+
+\begin{equation*}
+    E \left\{ \mathbf{w}_j \mathbf{v}_k^T \right\} = \mathbf{0} \, , \phantom{.} \mathrm{for} \, \mathrm{all} \, j \, \mathrm{and} \, k
+\end{equation*}
+
+We wish to develop an optimal estimation of the state
+
+\begin{equation*}
+    \hat{\mathbf{x}}_k = E \left\{ \mathbf{x}_k \right\}
+\end{equation*}
+
+where the state estimation error is
+
+\begin{equation*}
+    \mathbf{e}_k = \mathbf{x}_{k} - \hat{\mathbf{x}}_k
+\end{equation*}
+
+and the covariance of the state estimation error is
+
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{P}_k &= E \left\{ \mathbf{e}_k \mathbf{e}_k^T \right\} \\
+        &= E \left\{ \left[ \mathbf{x}_{k} - \hat{\mathbf{x}}_k \right] \left[ \mathbf{x}_{k} - \hat{\mathbf{x}}_k \right]^T \right\}
+    \end{aligned}
+\end{equation*}
+
+The estimation error sequence is uncorrelated with both the process and observation noise sequences
+
+\begin{equation*}
+    \begin{aligned}
+        E \left\{ \mathbf{e}_j \mathbf{w}_k^T \right\} &= \mathbf{0} \, , \phantom{.} \mathrm{for} \, \mathrm{all} \, j \, \mathrm{and} \, k \\
+        \phantom{.} \\
+        E \left\{ \mathbf{e}_j \mathbf{v}_k^T \right\} &= \mathbf{0} \, , \phantom{.} \mathrm{for} \, \mathrm{all} \, j \, \mathrm{and} \, k
+    \end{aligned}
+\end{equation*}
+
+Observe that the system dynamical model tells us that the state for time event $k$ is given by
+
+\begin{equation*}
+    \mathbf{x}_{k} = \mathbf{\Phi}_{k|k-1} \mathbf{x}_{k-1} + \mathbf{\Gamma}_{k|k-1} \mathbf{w}_{k-1}
+\end{equation*}
+
+Then, given a previously determined state estimate, $\hat{\mathbf{x}}_{k-1}$, the
+\textit{a priori} state projection estimate at time event $k$ is
+
+\boxed{
+\parbox{\textwidth}{
+\begin{equation}
+    \hat{\mathbf{x}}_{k|k-1} = \mathbf{\Phi}_{k|k-1} \, \hat{\mathbf{x}}_{k-1}
+    \label{eq:a-priori-state-estimate}
+\end{equation}
+}
+}
+
+with \textit{a priori} state estimation error
+
+\begin{equation*}
+    \mathbf{e}_{k|k-1} = \mathbf{x}_{k} - \hat{\mathbf{x}}_{k|k-1}
+\end{equation*}
+
+and \textit{a priori} state estimation error covariance
+
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{P}_{k|k-1} &= E \left\{ \mathbf{e}_{k|k-1} \mathbf{e}_{k|k-1}^T \right\} \\
+        &= E \left\{ \left[ \mathbf{x}_{k} - \hat{\mathbf{x}}_{k|k-1} \right] \left[ \mathbf{x}_{k} - \hat{\mathbf{x}}_{k|k-1} \right]^T \right\}
+    \end{aligned}
+\end{equation*}
+
+Substituting the expressions for $\mathbf{x}_k$ and $\hat{\mathbf{x}}_{k|k-1}$ into
+$\mathbf{e}_{k|k-1}$ gives
+
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{e}_{k|k-1} &= \mathbf{x}_{k} - \hat{\mathbf{x}}_{k|k-1} \\
+        &= \mathbf{\Phi}_{k|k-1} \mathbf{x}_{k-1} + \mathbf{\Gamma}_{k|k-1} \mathbf{w}_{k-1} - \mathbf{\Phi}_{k|k-1} \hat{\mathbf{x}}_{k-1} \\
+        &= \mathbf{\Phi}_{k|k-1} \left[ \mathbf{x}_{k-1} - \hat{\mathbf{x}}_{k-1} \right] + \mathbf{\Gamma}_{k|k-1} \mathbf{w}_{k-1} \\
+        &= \mathbf{\Phi}_{k|k-1} \mathbf{e}_{k-1} + \mathbf{\Gamma}_{k|k-1} \mathbf{w}_{k-1}
+    \end{aligned}
+\end{equation*}
+
+At this point, it will be helpful to introduce two useful lemmas for equations of this form.
+
+\boxed{
+\parbox{\textwidth}{
+\begin{lemma}
+\label{covariance-of-sum}
+Let $\mathbf{a}_k$ and $\mathbf{b}_k$ both be uncorrelated random sequences,
+$E \left\{ \mathbf{a}_k \mathbf{b}_k^T \right\} = \mathbf{0}$,
+with covariances
+$\mathbf{A}_k = E \left\{ \mathbf{a}_k \mathbf{a}_k^T \right\}$
+and
+$\mathbf{B}_k = E \left\{ \mathbf{b}_k \mathbf{b}_k^T \right\}$, respectively.
+Furthermore, let $\mathbf{C}$ and $\mathbf{D}$ be constant matrices of dimensions
+such that
+$\dim \left( \mathbf{C} \mathbf{a}_k \right) = \dim \left( \mathbf{D} \mathbf{b}_k \right)$.
+Then
+\begin{equation*}
+    E \left\{ \left[ \mathbf{C} \mathbf{a}_k + \mathbf{D} \mathbf{b}_k \right] \left[ \mathbf{C} \mathbf{a}_k + \mathbf{D} \mathbf{b}_k \right]^T \right\}
+    = \mathbf{C} \mathbf{A}_k \mathbf{C}^T + \mathbf{D} \mathbf{B}_k \mathbf{D}^T
+\end{equation*}
+\end{lemma}
+}
+}
+
+\begin{proof}
+\begin{equation*}
+    \begin{aligned}
+        & E \left\{ \left[ \mathbf{C} \mathbf{a}_k + \mathbf{D} \mathbf{b}_k \right] \left[ \mathbf{C} \mathbf{a}_k + \mathbf{D} \mathbf{b}_k \right]^T \right\} \\
+        & \phantom{XXXX} = E \left\{ \left[ \mathbf{C} \mathbf{a}_k + \mathbf{D} \mathbf{b}_k \right] \left[ \mathbf{a}_k^T \mathbf{C}^T + \mathbf{b}_k^T \mathbf{D}^T \right] \right\} \\
+        & \phantom{XXXX} = E \left\{ \left[ \mathbf{C} \mathbf{a}_k + \mathbf{D} \mathbf{b}_k \right] \mathbf{a}_k^T \mathbf{C}^T
+        + \left[ \mathbf{C} \mathbf{a}_k + \mathbf{D} \mathbf{b}_k \right] \mathbf{b}_k^T \mathbf{D}^T \right\} \\
+        & \phantom{XXXX} = E \left\{ \mathbf{C} \mathbf{a}_k \mathbf{a}_k^T \mathbf{C}^T + \mathbf{D} \mathbf{b}_k \mathbf{a}_k^T \mathbf{C}^T
+        + \mathbf{C} \mathbf{a}_k \mathbf{b}_k^T \mathbf{D}^T + \mathbf{D} \mathbf{b}_k \mathbf{b}_k^T \mathbf{D}^T \right\} \\
+        & \phantom{XXXX} = \mathbf{C} E \left\{ \mathbf{a}_k \mathbf{a}_k^T \right\} \mathbf{C}^T + \mathbf{D} E \left\{ \mathbf{b}_k \mathbf{a}_k^T \right\} \mathbf{C}^T
+        + \mathbf{C} E \left\{ \mathbf{a}_k \mathbf{b}_k^T \right\} \mathbf{D}^T + \mathbf{D} E \left\{ \mathbf{b}_k \mathbf{b}_k^T \right\} \mathbf{D}^T \\
+        & \phantom{XXXX} = \mathbf{C} \mathbf{A}_k \mathbf{C}^T + \mathbf{0} + \mathbf{0} + \mathbf{D} \mathbf{B}_k \mathbf{D}^T \\
+        & \phantom{XXXX} = \mathbf{C} \mathbf{A}_k \mathbf{C}^T + \mathbf{D} \mathbf{B}_k \mathbf{D}^T
+    \end{aligned}
+\end{equation*}
+\end{proof}
+
+\boxed{
+\parbox{\textwidth}{
+\begin{lemma}
+\label{covariance-of-difference}
+Let $\mathbf{a}_k$ and $\mathbf{b}_k$ both be uncorrelated random sequences,
+$E \left\{ \mathbf{a}_k \mathbf{b}_k^T \right\} = \mathbf{0}$,
+with covariances
+$\mathbf{A}_k = E \left\{ \mathbf{a}_k \mathbf{a}_k^T \right\}$
+and
+$\mathbf{B}_k = E \left\{ \mathbf{b}_k \mathbf{b}_k^T \right\}$, respectively.
+Furthermore, let $\mathbf{C}$ and $\mathbf{D}$ be constant matrices of dimensions
+such that
+$\dim \left( \mathbf{C} \mathbf{a}_k \right) = \dim \left( \mathbf{D} \mathbf{b}_k \right)$.
+Then
+\begin{equation*}
+    E \left\{ \left[ \mathbf{C} \mathbf{a}_k - \mathbf{D} \mathbf{b}_k \right] \left[ \mathbf{C} \mathbf{a}_k - \mathbf{D} \mathbf{b}_k \right]^T \right\}
+    = \mathbf{C} \mathbf{A}_k \mathbf{C}^T + \mathbf{D} \mathbf{B}_k \mathbf{D}^T
+\end{equation*}
+\end{lemma}
+}
+}
+
+\begin{proof}
+\begin{equation*}
+    \begin{aligned}
+        &E \left\{ \left[ \mathbf{C} \mathbf{a}_k - \mathbf{D} \mathbf{b}_k \right] \left[ \mathbf{C} \mathbf{a}_k - \mathbf{D} \mathbf{b}_k \right]^T \right\} \\
+        & \phantom{XXXX} = E \left\{ \left[ \mathbf{C} \mathbf{a}_k - \mathbf{D} \mathbf{b}_k \right] \left[ \mathbf{a}_k^T \mathbf{C}^T - \mathbf{b}_k^T \mathbf{D}^T \right] \right\} \\
+        & \phantom{XXXX} = E \left\{ \left[ \mathbf{C} \mathbf{a}_k - \mathbf{D} \mathbf{b}_k \right] \mathbf{a}_k^T \mathbf{C}^T
+        - \left[ \mathbf{C} \mathbf{a}_k - \mathbf{D} \mathbf{b}_k \right] \mathbf{b}_k^T \mathbf{D}^T \right\} \\
+        & \phantom{XXXX} = E \left\{ \mathbf{C} \mathbf{a}_k \mathbf{a}_k^T \mathbf{C}^T - \mathbf{D} \mathbf{b}_k \mathbf{a}_k^T \mathbf{C}^T
+        - \mathbf{C} \mathbf{a}_k \mathbf{b}_k^T \mathbf{D}^T + \mathbf{D} \mathbf{b}_k \mathbf{b}_k^T \mathbf{D}^T \right\} \\
+        & \phantom{XXXX} = \mathbf{C} E \left\{ \mathbf{a}_k \mathbf{a}_k^T \right\} \mathbf{C}^T - \mathbf{D} E \left\{ \mathbf{b}_k \mathbf{a}_k^T \right\} \mathbf{C}^T
+        - \mathbf{C} E \left\{ \mathbf{a}_k \mathbf{b}_k^T \right\} \mathbf{D}^T + \mathbf{D} E \left\{ \mathbf{b}_k \mathbf{b}_k^T \right\} \mathbf{D}^T \\
+        & \phantom{XXXX} = \mathbf{C} \mathbf{A}_k \mathbf{C}^T - \mathbf{0} - \mathbf{0} + \mathbf{D} \mathbf{B}_k \mathbf{D}^T \\
+        & \phantom{XXXX} = \mathbf{C} \mathbf{A}_k \mathbf{C}^T + \mathbf{D} \mathbf{B}_k \mathbf{D}^T
+    \end{aligned}
+\end{equation*}
+\end{proof}
+
+Now, noting that
+
+\begin{equation*}
+    E \left\{ \mathbf{e}_{k-1} \mathbf{w}_{k-1}^T \right\} = \mathbf{0}
+\end{equation*}
+
+and using Lemma \ref{covariance-of-sum}, the expansion of the \textit{a priori} state
+projection estimate error covariance gives
+
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{P}_{k|k-1} &= E \left\{ \mathbf{e}_{k|k-1} \mathbf{e}_{k|k-1}^T \right\} \\
+        &= E \left\{ \left[ \mathbf{\Phi}_{k|k-1} \mathbf{e}_{k-1} + \mathbf{\Gamma}_{k|k-1} \mathbf{w}_{k-1} \right]
+        \left[ \mathbf{\Phi}_{k|k-1} \mathbf{e}_{k-1} + \mathbf{\Gamma}_{k|k-1} \mathbf{w}_{k-1} \right]^T \right\} \\
+        &= \mathbf{\Phi}_{k|k-1} \mathbf{P}_{k-1} \mathbf{\Phi}_{k|k-1}^T + \mathbf{\Gamma}_{k|k-1} \mathbf{Q}_{k-1} \mathbf{\Gamma}_{k|k-1}^T
+    \end{aligned}
+\end{equation*}
+
+and so the \textit{a priori} state projection estimate error covariance is
+
+\boxed{
+\parbox{\textwidth}{
+\begin{equation}
+    \mathbf{P}_{k|k-1} = \mathbf{\Phi}_{k|k-1} \mathbf{P}_{k-1} \mathbf{\Phi}_{k|k-1}^T + \mathbf{\Gamma}_{k|k-1} \mathbf{Q}_{k-1} \mathbf{\Gamma}_{k|k-1}^T
+    \label{eq:a-priori-state-covariance}
+\end{equation}
+}
+}
+
+In addition, observe that, because $\mathbf{P}_{k|k-1}$ is a covariance matrix,
+
+\begin{equation*}
+    \mathbf{P}_{k|k-1}^T = \mathbf{P}_{k|k-1}
+\end{equation*}
+
+Now, given our \textit{a priori} state projection estimate, $\hat{\mathbf{x}}_{k|k-1}$,
+we can estimate the corresponding projection observation estimate from
+
+\boxed{
+\parbox{\textwidth}{
+\begin{equation}
+    \hat{\mathbf{z}}_k = \mathbf{H}_k \hat{\mathbf{x}}_{k|k-1}
+    \label{eq:a-priori-observation-estimate}
+\end{equation}
+}
+}
+
+We then form the observation residual, i.e., the observation estimation error
+
+\boxed{
+\parbox{\textwidth}{
+\begin{equation}
+    \tilde{\mathbf{z}}_k = \mathbf{z}_k - \hat{\mathbf{z}}_k
+    \label{eq:observation-residual}
+\end{equation}
+}
+}
+
+Substituting the expressions for $\mathbf{z}_k$ and $\hat{\mathbf{z}}_k$ into $\tilde{\mathbf{z}}_k$ gives
+
+\begin{equation*}
+    \begin{aligned}
+        \tilde{\mathbf{z}}_k &= \mathbf{z}_k - \hat{\mathbf{z}}_k \\
+        &= \mathbf{H}_k \mathbf{x}_k + \mathbf{v}_k - \mathbf{H}_k \hat{\mathbf{x}}_{k|k-1} \\
+        &= \mathbf{H}_k \left[ \mathbf{x}_k - \hat{\mathbf{x}}_{k|k-1} \right] + \mathbf{v}_k \\
+        &= \mathbf{H}_k \mathbf{e}_{k|k-1} + \mathbf{v}_k
+    \end{aligned}
+\end{equation*}
+
+Noting that
+
+\begin{equation*}
+    E \left\{ \mathbf{e}_{k|k-1} \mathbf{v}_k^T \right\} = \mathbf{0}
+\end{equation*}
+
+and using Lemma \ref{covariance-of-sum}, we then see that the covariance of the
+observation residual is
+
+\begin{equation*}
+    \begin{aligned}
+        E \left\{ \tilde{\mathbf{z}}_k \tilde{\mathbf{z}}_k^T \right\}
+        &= E \left\{ \left[ \mathbf{H}_k \mathbf{e}_{k|k-1} + \mathbf{v}_k \right] \left[ \mathbf{H}_k \mathbf{e}_{k|k-1} + \mathbf{v}_k \right]^T \right\} \\
+        &= \mathbf{H}_{k} \, \mathbf{P}_{k|k-1} \, \mathbf{H}_{k}^T + \mathbf{R}_{k}
+    \end{aligned}
+\end{equation*}
+
+Define
+
+\boxed{
+\parbox{\textwidth}{
+\begin{equation}
+    \mathbf{S}_k = \mathbf{H}_k \, \mathbf{P}_{k|k-1} \, \mathbf{H}_k^T + \mathbf{R}_k
+    \label{eq:observation-residual-covariance}
+\end{equation}
+}
+}
+
+Therefore $\mathbf{S}_k$ is the covariance of the observation residual
+
+\begin{equation*}
+    \mathbf{S}_k = E \left\{ \tilde{\mathbf{z}}_k \tilde{\mathbf{z}}_k^T \right\}
+\end{equation*}
+
+Observe that $\mathbf{S}_k$ is a square, symmetric matrix, and so
+
+\begin{equation*}
+    \mathbf{S}_k^T = \mathbf{S}_k
+\end{equation*}
+
+Given $\hat{\mathbf{x}}_{k|k-1}$, $\mathbf{P}_{k|k-1}$, $\tilde{\mathbf{z}}_k$, and
+$\mathbf{S}_k$, our objective is to determine an optimal gain matrix, $\mathbf{K}_k$,
+such that the \textit{a posteriori} state correction estimate is
+
+\boxed{
+\parbox{\textwidth}{
+\begin{equation}
+    \hat{\mathbf{x}}_{k} = \hat{\mathbf{x}}_{k|k-1} + \mathbf{K}_k \tilde{\mathbf{z}}_k
+    \label{eq:state-correction-estimate}
+\end{equation}
+}
+}
+
+with \textit{a posteriori} state correction estimation error
+
+\begin{equation*}
+    \mathbf{e}_{k} = \mathbf{x}_{k} - \hat{\mathbf{x}}_{k}
+\end{equation*}
+
+and \textit{a posteriori} state correction estimation error covariance
+
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{P}_{k} &= E \left\{ \mathbf{e}_{k} \mathbf{e}_{k}^T \right\} \\
+        &= E \left\{ \left[ \mathbf{x}_{k} - \hat{\mathbf{x}}_{k} \right] \left[ \mathbf{x}_{k} - \hat{\mathbf{x}}_{k} \right]^T \right\}
+    \end{aligned}
+\end{equation*}
+
+The gain, $\mathbf{K}_k$, is considered optimal if the diagonal elements of $\mathbf{P}_k$
+are minimal, i.e., the \textit{a posteriori} state estimation error variances are minimal.
+
+Substituting the \textit{a posteriori} state correction estimate expression for
+$\hat{\mathbf{x}}_k$ into $\mathbf{e}_k$ gives
+
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{e}_{k} &= \mathbf{x}_{k} - \hat{\mathbf{x}}_{k} \\
+        &= \mathbf{x}_{k} - \left( \hat{\mathbf{x}}_{k|k-1} + \mathbf{K}_k \left[ \mathbf{z}_k - \hat{\mathbf{z}}_k \right] \right) \\
+        &= \mathbf{x}_{k} - \hat{\mathbf{x}}_{k|k-1} - \mathbf{K}_k \left[ \mathbf{z}_k - \hat{\mathbf{z}}_k \right] \\
+        &= \mathbf{x}_{k} - \hat{\mathbf{x}}_{k|k-1} - \mathbf{K}_k \mathbf{z}_k + \mathbf{K}_k \hat{\mathbf{z}}_k \\
+        &= \mathbf{x}_{k} - \hat{\mathbf{x}}_{k|k-1} - \mathbf{K}_k \left[ \mathbf{H}_k \mathbf{x}_k + \mathbf{v}_k \right]
+        + \mathbf{K}_k \left[ \mathbf{H}_k \hat{\mathbf{x}}_{k|k-1} \right] \\
+        &= \mathbf{x}_{k} - \hat{\mathbf{x}}_{k|k-1} - \mathbf{K}_k \mathbf{H}_k \mathbf{x}_k - \mathbf{K}_k \mathbf{v}_k + \mathbf{K}_k \mathbf{H}_k \hat{\mathbf{x}}_{k|k-1} \\
+        &= \mathbf{x}_{k} - \mathbf{K}_k \mathbf{H}_k \mathbf{x}_k - \hat{\mathbf{x}}_{k|k-1} + \mathbf{K}_k \mathbf{H}_k \hat{\mathbf{x}}_{k|k-1} - \mathbf{K}_k \mathbf{v}_k \\
+        &= \left[ \mathbf{I} - \mathbf{K}_k \mathbf{H}_k \right] \mathbf{x}_{k} - \left[ \mathbf{I}
+        - \mathbf{K}_k \mathbf{H}_k \right] \hat{\mathbf{x}}_{k|k-1} - \mathbf{K}_k \mathbf{v}_k \\
+        &= \left[ \mathbf{I} - \mathbf{K}_k \mathbf{H}_k \right] \left[ \mathbf{x}_{k} - \hat{\mathbf{x}}_{k|k-1} \right] - \mathbf{K}_k \mathbf{v}_k \\
+        &= \left[ \mathbf{I} - \mathbf{K}_k \mathbf{H}_k \right] \mathbf{e}_{k|k-1} - \mathbf{K}_k \mathbf{v}_k
+    \end{aligned}
+\end{equation*}
+
+Noting that
+
+\begin{equation*}
+    E \left\{ \mathbf{e}_{k|k-1} \mathbf{v}_k^T \right\} = \mathbf{0}
+\end{equation*}
+
+and using Lemma \ref{covariance-of-difference}, the expansion of the \textit{a posteriori}
+state correction estimate error covariance gives
+
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{P}_{k} &= E \left\{ \mathbf{e}_{k} \mathbf{e}_{k}^T \right\} \\
+        &= E \left\{ \left[ \left[ \mathbf{I} - \mathbf{K}_k \mathbf{H}_k \right] \mathbf{e}_{k|k-1} - \mathbf{K}_k \mathbf{v}_k \right]
+                \left[ \left[ \mathbf{I} - \mathbf{K}_k \mathbf{H}_k \right] \mathbf{e}_{k|k-1} - \mathbf{K}_k \mathbf{v}_k \right]^T \right\} \\
+        &= \left[ \mathbf{I} - \mathbf{K}_k \mathbf{H}_k \right] \mathbf{P}_{k|k-1} \left[ \mathbf{I} - \mathbf{K}_k \mathbf{H}_k \right]^T
+                 + \mathbf{K}_k \mathbf{R}_k \mathbf{K}_k^T
+    \end{aligned}
+\end{equation*}
+
+and so the \textit{a posteriori} state correction estimate error covariance is
+
+\boxed{
+\parbox{\textwidth}{
+\begin{equation}
+    \mathbf{P}_{k} = \left[ \mathbf{I} - \mathbf{K}_k \mathbf{H}_k \right] \mathbf{P}_{k|k-1} \left[ \mathbf{I} - \mathbf{K}_k \mathbf{H}_k \right]^T
+               + \mathbf{K}_k \mathbf{R}_k \mathbf{K}_k^T
+    \label{eq:a-posteriori-state-covariance-joseph}
+\end{equation}
+}
+}
+
+This form of the \textit{a posteriori} state correction error covariance is known as the
+Joseph form of the \textit{a posteriori} covariance update (named after Peter D. Joseph).
+It is worth noting that it does not rely on $\mathbf{K}_{k}$ being optimal; it holds for
+any $\mathbf{K}_{k}$. Also, because each of the terms is a quadratic term of the form 
+$\mathbf{A} \mathbf{B} \mathbf{A}^T$, the Joseph form is numerically suited for
+ill-conditioned systems.
+
+Continuing our expansion and refactoring of $\mathbf{P}_{k}$ gives
+
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{P}_{k} &= \left[ \mathbf{I} - \mathbf{K}_k \mathbf{H}_k \right] \mathbf{P}_{k|k-1} \left[ \mathbf{I} - \mathbf{K}_k \mathbf{H}_k \right]^T
+          + \mathbf{K}_k \mathbf{R}_k \mathbf{K}_k^T \\
+        &= \left[ \mathbf{I} - \mathbf{K}_k \mathbf{H}_k \right] \mathbf{P}_{k|k-1} \left[ \mathbf{I} - \mathbf{H}_k^T \mathbf{K}_k^T \right]
+          + \mathbf{K}_k \mathbf{R}_k \mathbf{K}_k^T \\
+        &= \left[ \mathbf{P}_{k|k-1} - \mathbf{K}_k \mathbf{H}_k \mathbf{P}_{k|k-1} \right] \left[ \mathbf{I} - \mathbf{H}_k^T \mathbf{K}_k^T \right]
+          + \mathbf{K}_k \mathbf{R}_k \mathbf{K}_k^T \\
+        &= \left[ \mathbf{P}_{k|k-1} - \mathbf{K}_k \mathbf{H}_k \mathbf{P}_{k|k-1} \right]
+          - \left[ \mathbf{P}_{k|k-1} - \mathbf{K}_k \mathbf{H}_k \mathbf{P}_{k|k-1} \right] \mathbf{H}_k^T \mathbf{K}_k^T
+          + \mathbf{K}_k \mathbf{R}_k \mathbf{K}_k^T \\
+        &= \left[ \mathbf{P}_{k|k-1} - \mathbf{K}_k \mathbf{H}_k \mathbf{P}_{k|k-1} \right]
+          - \left[ \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{K}_k^T - \mathbf{K}_k \mathbf{H}_k \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{K}_k^T \right]
+          + \mathbf{K}_k \mathbf{R}_k \mathbf{K}_k^T \\
+        &= \mathbf{P}_{k|k-1} - \mathbf{K}_k \mathbf{H}_k \mathbf{P}_{k|k-1}
+          - \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{K}_k^T + \mathbf{K}_k \mathbf{H}_k \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{K}_k^T
+          + \mathbf{K}_k \, \mathbf{R}_k \, \mathbf{K}_k^T \\
+        &= \mathbf{P}_{k|k-1} - \mathbf{K}_k \mathbf{H}_k \mathbf{P}_{k|k-1} - \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{K}_k^T
+          + \mathbf{K}_k \left[ \mathbf{H}_k \mathbf{P}_{k|k-1} \mathbf{H}_k^T + \mathbf{R}_k \right] \mathbf{K}_k^T
+    \end{aligned}
+\end{equation*}
+
+Recall the definiton of $\mathbf{S}_k$ from (\ref{eq:observation-residual-covariance}).
+Then the expression for $\mathbf{P}_k$ becomes
+
+\begin{equation}
+    \mathbf{P}_{k} = \mathbf{P}_{k|k-1} - \mathbf{K}_k \mathbf{H}_k \mathbf{P}_{k|k-1} - \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{K}_k^T
+    + \mathbf{K}_k \, \mathbf{S}_k \, \mathbf{K}_k^T
+    \label{eq:state-correction-covariance-interim}
+\end{equation}
+
+What we wish to do is find the value of $\mathbf{K}_k$ that minimizes the diagonal
+elements of $\mathbf{P}_k$. In other words, we want the value of $\mathbf{K}_k$ that
+minimizes the state estimate error variances. To do this, we need to find the value of
+$\mathbf{K}_k$ that causes
+
+\begin{equation*}
+    \frac {d \left[ \mathrm{tr} \left( \mathbf{P}_k \right) \right] } {d \mathbf{K}_k} = \mathbf{0}
+\end{equation*}
+
+We use the differential operation where, if $s$ is a scalar value and $\mathbf{M}$ is a
+matrix value, then
+
+\begin{equation*}
+    \frac {d s} {d \mathbf{M}} \triangleq 
+    \begin{bmatrix}
+        \dfrac{\partial s}{\partial m_{11}} & \dfrac{\partial s}{\partial m_{12}} & \dfrac{\partial s}{\partial m_{13}} & \cdots \\
+        \phantom{.} \\
+        \dfrac{\partial s}{\partial m_{21}} & \dfrac{\partial s}{\partial m_{22}} & \dfrac{\partial s}{\partial m_{23}} & \cdots \\
+        \phantom{.} \\
+        \dfrac{\partial s}{\partial m_{31}} & \dfrac{\partial s}{\partial m_{32}} & \dfrac{\partial s}{\partial m_{33}} & \cdots \\
+        \phantom{.} \\
+        \vdots & \vdots & \vdots & \ddots
+    \end{bmatrix}
+\end{equation*}
+
+We can make use of the following differentiation formulas:
+
+\begin{equation*}
+    \frac {d \left[ \mathrm{tr} \left( \mathbf{A} \mathbf{B} \right) \right] } {d \mathbf{A}} = \mathbf{B}^T , \phantom{X} (\mathbf{A} \mathbf{B} \, \mathrm{must} \, \mathrm{be} \, \mathrm{square})
+\end{equation*}
+
+\begin{equation*}
+    \frac {d \left[ \mathrm{tr} \left( \mathbf{A} \mathbf{C} \mathbf{A}^T \right) \right]} {d \mathbf{A}} = 2 \mathbf{A} \mathbf{C} , \phantom{X} (\mathbf{C} \, \mathrm{must} \, \mathrm{be} \, \mathrm{symmetric})
+\end{equation*}
+
+In addition, because $\mathrm{tr}\left(\mathbf{B}^T \mathbf{A}^T\right) = \mathrm{tr}\left(\mathbf{A} \mathbf{B}\right)$,
+we note that
+
+\begin{equation*}
+    \frac {d \left[ \mathrm{tr} \left( \mathbf{B}^T \mathbf{A}^T \right) \right]} {d \mathbf{A}} = \mathbf{B}^T , \phantom{X} (\mathbf{B}^T \mathbf{A}^T \, \mathrm{must} \, \mathrm{be} \, \mathrm{square})
+\end{equation*}
+
+Then
+
+\begin{equation*}
+    \begin{aligned}
+        \frac {d \left[ \mathrm{tr}(\mathbf{P}_k) \right]} {d \mathbf{K}_k}
+        &= \frac {d \left[ \mathrm{tr} \left(
+        \mathbf{P}_{k|k-1} - \mathbf{K}_k \mathbf{H}_k \mathbf{P}_{k|k-1} - \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{K}_k^T
+        + \mathbf{K}_k \, \mathbf{S}_k \, \mathbf{K}_k^T
+        \right) \right]} {d \mathbf{K}_k} \\
+        &= \frac {d \left[ \mathrm{tr} \left( \mathbf{P}_{k|k-1} \right) \right] } {d \mathbf{K}_k}
+         - \frac {d \left[ \mathrm{tr} \left( \mathbf{K}_k \mathbf{H}_k \mathbf{P}_{k|k-1} \right) \right] } {d \mathbf{K}_k}
+         - \frac {d \left[ \mathrm{tr} \left( \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{K}_k^T \right) \right] } {d \mathbf{K}_k}
+         + \frac {d \left[ \mathrm{tr} \left( \mathbf{K}_k \, \mathbf{S}_k \, \mathbf{K}_k^T \right) \right] } {d \mathbf{K}_k} \\
+        &= \mathbf{0} - \mathbf{P}_{k|k-1} \mathbf{H}_k^T - \mathbf{P}_{k|k-1} \mathbf{H}_k^T + 2 \mathbf{K}_k \, \mathbf{S}_k \\
+        &= - 2 \mathbf{P}_{k|k-1} \mathbf{H}_k^T + 2 \mathbf{K}_k \, \mathbf{S}_k
+    \end{aligned}
+\end{equation*}
+
+Setting this expression to $\mathbf{0}$ gives
+
+\begin{equation*}
+    \begin{aligned}
+        - 2 \mathbf{P}_{k|k-1} \mathbf{H}_k^T + 2 \mathbf{K}_k \mathbf{S}_k &= \mathbf{0} \\
+        \mathbf{K}_k \mathbf{S}_k &= \mathbf{P}_{k|k-1} \mathbf{H}_k^T \\
+        \mathbf{K}_k &= \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{S}_k^{-1}
+    \end{aligned}
+\end{equation*}
+
+and so the optimal gain, that is, the Kalman gain, is
+
+\boxed{
+\parbox{\textwidth}{
+\begin{equation}
+    \mathbf{K}_k = \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{S}_k^{-1}
+    \label{eq:kalman-gain}
+\end{equation}
+}
+}
+
+At this point, it is worth noting that we can also determine $\mathbf{K}_k$ using purely
+algebraic methods. Noting that $\mathbf{S}_k$ is a symmetric matrix, it is well-known
+that there exists a matrix, $\mathbf{M}$, such that
+
+\begin{equation*}
+    \mathbf{S}_{k} = \mathbf{M} \mathbf{M}^T
+\end{equation*}
+
+Then (\ref{eq:state-correction-covariance-interim}) can be written as
+
+\begin{equation*}
+    \mathbf{P}_{k} = \mathbf{P}_{k|k-1} - \mathbf{K}_k \mathbf{H}_k \mathbf{P}_{k|k-1} - \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{K}_k^T
+    + \mathbf{K}_k \, \mathbf{M} \mathbf{M}^T \, \mathbf{K}_k^T
+\end{equation*}
+
+Separating the non-$\mathbf{K}_k$ terms from the $\mathbf{K}_k$ terms gives
+
+\begin{equation}
+    \mathbf{P}_{k} - \mathbf{P}_{k|k-1} = - \mathbf{K}_k \mathbf{H}_k \mathbf{P}_{k|k-1} - \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{K}_k^T
+    + \mathbf{K}_k \, \mathbf{M} \mathbf{M}^T \, \mathbf{K}_k^T
+    \label{eq:Pk-Pkm1}
+\end{equation}
+
+Note that the $- \mathbf{K}_k \mathbf{H}_k \mathbf{P}_{k|k-1} - \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{K}_k^T$
+term is linear in $\mathbf{K}_{k}$ and the $\mathbf{K}_k \, \mathbf{M} \mathbf{M}^T \, \mathbf{K}_k^T$
+term is quadratic in $\mathbf{K}_{k}$.
+
+Now let us expand a general quadratic expression using the factor $\mathbf{A} - \mathbf{K}_k \mathbf{M}$,
+where $\mathbf{A}$ is a yet to be determined matrix. In doing this, we obtain the expression
+
+\begin{equation*}
+    \begin{aligned}
+        \left[ \mathbf{A} - \mathbf{K}_k \mathbf{M} \right] \left[ \mathbf{A} - \mathbf{K}_k \mathbf{M} \right]^T
+        &= \left[ \mathbf{A} - \mathbf{K}_k \mathbf{M} \right] \left[ \mathbf{A}^T - \mathbf{M}^T \mathbf{K}_k^T \right] \\
+        &= \left[ \mathbf{A} - \mathbf{K}_k \mathbf{M} \right] \mathbf{A}^T - \left[ \mathbf{A} - \mathbf{K}_k \mathbf{M} \right] \mathbf{M}^T \mathbf{K}_k^T \\
+        &= \mathbf{A} \mathbf{A}^T - \mathbf{K}_k \mathbf{M} \mathbf{A}^T - \mathbf{A} \mathbf{M}^T \mathbf{K}_k^T + \mathbf{K}_k \mathbf{M} \mathbf{M}^T \mathbf{K}_k^T
+    \end{aligned}
+\end{equation*}
+
+and separating the non-$\mathbf{K}_k$ terms from the $\mathbf{K}_k$ terms gives
+
+\begin{equation}
+    \left[ \mathbf{A} - \mathbf{K}_k \mathbf{M} \right] \left[ \mathbf{A} - \mathbf{K}_k \mathbf{M} \right]^T - \mathbf{A} \mathbf{A}^T
+    = - \mathbf{K}_k \mathbf{M} \mathbf{A}^T - \mathbf{A} \mathbf{M}^T \mathbf{K}_k^T + \mathbf{K}_k \mathbf{M} \mathbf{M}^T \mathbf{K}_k^T
+    \label{eq:quadratic-expression}
+\end{equation}
+
+Note that the RHS of (\ref{eq:quadratic-expression}) has exactly the same structure as the
+RHS of (\ref{eq:Pk-Pkm1}).
+What we can now do is use (\ref{eq:quadratic-expression}) to, in essence, complete the
+square of the RHS of (\ref{eq:Pk-Pkm1})
+
+\begin{equation}
+    \begin{aligned}
+        \mathbf{P}_{k} - \mathbf{P}_{k|k-1}
+        &= \left[ \mathbf{A} - \mathbf{K}_k \mathbf{M} \right] \left[ \mathbf{A} - \mathbf{K}_k \mathbf{M} \right]^T - \mathbf{A} \mathbf{A}^T \\
+        &= - \mathbf{K}_k \mathbf{M} \mathbf{A}^T - \mathbf{A} \mathbf{M}^T \mathbf{K}_k^T + \mathbf{K}_k \mathbf{M} \mathbf{M}^T \mathbf{K}_k^T
+    \end{aligned}
+    \label{eq:P-completed-square}
+\end{equation}
+
+Equating RHS of (\ref{eq:P-completed-square}) with the RHS of (\ref{eq:Pk-Pkm1}) gives
+
+\begin{equation*}
+    \begin{aligned}
+        - \mathbf{K}_k \mathbf{M} \mathbf{A}^T - \mathbf{A} \mathbf{M}^T \mathbf{K}_k^T + \mathbf{K}_k \mathbf{M} \mathbf{M}^T \mathbf{K}_k^T &=
+        - \mathbf{K}_k \mathbf{H}_k \mathbf{P}_{k|k-1} - \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{K}_k^T + \mathbf{K}_k \, \mathbf{M} \mathbf{M}^T \, \mathbf{K}_k^T \\
+        - \mathbf{K}_k \mathbf{M} \mathbf{A}^T - \mathbf{A} \mathbf{M}^T \mathbf{K}_k^T &=
+        - \mathbf{K}_k \mathbf{H}_k \mathbf{P}_{k|k-1} - \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{K}_k^T \\
+        \mathbf{K}_k \mathbf{M} \mathbf{A}^T + \mathbf{A} \mathbf{M}^T \mathbf{K}_k^T &=
+        \mathbf{K}_k \mathbf{H}_k \mathbf{P}_{k|k-1} + \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{K}_k^T
+    \end{aligned}
+\end{equation*}
+
+Hence
+
+\begin{equation*}
+    \mathbf{A} \mathbf{M}^T = \mathbf{P}_{k|k-1} \mathbf{H}_k^T
+\end{equation*}
+
+and so
+
+\begin{equation}
+    \mathbf{A} = \mathbf{P}_{k|k-1} \mathbf{H}_k^T \left( \mathbf{M}^T \right)^{-1}
+    \label{eq:first-expression-for-A}
+\end{equation}
+
+Now, recall from (\ref{eq:P-completed-square}) that
+
+\begin{equation*}
+    \mathbf{P}_{k} - \mathbf{P}_{k|k-1} = \left[ \mathbf{A} - \mathbf{K}_k \mathbf{M} \right] \left[ \mathbf{A} - \mathbf{K}_k \mathbf{M} \right]^T - \mathbf{A} \mathbf{A}^T
+\end{equation*}
+
+Then $\mathbf{P}_{k}$ is
+
+\begin{equation*}
+    \mathbf{P}_{k} = \mathbf{P}_{k|k-1} + \left[ \mathbf{A} - \mathbf{K}_k \mathbf{M} \right] \left[ \mathbf{A} - \mathbf{K}_k \mathbf{M} \right]^T - \mathbf{A} \mathbf{A}^T
+\end{equation*}
+
+Because the terms of this expression are square, symmetric matrices, and because $\mathbf{A}$ 
+does not depend on $\mathbf{K}_k$, the only way to minimize the diagonal elements of
+$\mathbf{P}_k$ is to force the $\mathbf{A} - \mathbf{K}_k \, \mathbf{M}$ term to zero
+
+\begin{equation*}
+    \mathbf{A} - \mathbf{K}_k \, \mathbf{M} = \mathbf{0}
+\end{equation*}
+
+and so
+
+\begin{equation}
+    \mathbf{A} = \mathbf{K}_k \, \mathbf{M}
+    \label{eq:second-expression-for-A}
+\end{equation}
+
+Equating (\ref{eq:second-expression-for-A}) with (\ref{eq:first-expression-for-A}) gives
+
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{K}_k \, \mathbf{M} &= \mathbf{P}_{k|k-1} \mathbf{H}_k^T \left( \mathbf{M}^T \right)^{-1} \\
+        \mathbf{K}_k &= \mathbf{P}_{k|k-1} \mathbf{H}_k^T \left( \mathbf{M}^T \right)^{-1} \left( \mathbf{M} \right)^{-1} \\
+                     &= \mathbf{P}_{k|k-1} \mathbf{H}_k^T \left( \mathbf{M} \mathbf{M}^T \right)^{-1} \\
+                     &= \mathbf{P}_{k|k-1} \mathbf{H}_k^T \left( \mathbf{S}_k \right)^{-1}
+    \end{aligned}
+\end{equation*}
+
+This, of course, agrees with what was obtained from the differential calculus approach in
+(\ref{eq:kalman-gain}), although it took significantly more steps to get here.
+
+It should be noted that our optimization criteria of minimizing the diagonal elements of
+$\mathbf{P}_k$ constitutes a least-squares optimization criteria (the diagonal elements
+are the variances of the states). So $\mathbf{K}_k$ is said to be optimal in the
+least-squares sense. However, the Kalman filter is not a specialized least-squares estimator;
+it is its own formulation.
+
+Now that we have an expression for $\mathbf{K}_k$, the \textit{a posteriori} state correction
+estimate error covariance $\mathbf{P}_k$ becomes
+
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{P}_{k} &= \mathbf{P}_{k|k-1} - \mathbf{K}_k \mathbf{H}_k \mathbf{P}_{k|k-1} - \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{K}_k^T
+        + \mathbf{K}_k \, \mathbf{S}_k \, \mathbf{K}_k^T \\
+        &= \mathbf{P}_{k|k-1}
+        - \left[ \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{S}_k^{-1} \right] \mathbf{H}_k \mathbf{P}_{k|k-1}
+        - \mathbf{P}_{k|k-1} \mathbf{H}_k^T \left[ \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{S}_k^{-1} \right]^T \\
+        & \phantom{M} + \left[ \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{S}_k^{-1} \right] \mathbf{S}_k \left[ \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{S}_k^{-1} \right]^T \\
+        &= \mathbf{P}_{k|k-1}
+        - \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{S}_k^{-1} \mathbf{H}_k \mathbf{P}_{k|k-1}
+        - \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{S}_k^{-1} \mathbf{H}_k \mathbf{P}_{k|k-1} \\
+        & \phantom{M} + \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{S}_k^{-1} \mathbf{S}_k \mathbf{S}_k^{-1} \mathbf{H}_k \mathbf{P}_{k|k-1} \\
+        &= \mathbf{P}_{k|k-1}
+        - \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{S}_k^{-1} \mathbf{H}_k \mathbf{P}_{k|k-1}
+        - \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{S}_k^{-1} \mathbf{H}_k \mathbf{P}_{k|k-1} \\
+        & \phantom{M} + \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{S}_k^{-1} \mathbf{H}_k \mathbf{P}_{k|k-1} \\
+        &= \mathbf{P}_{k|k-1}
+        - 2 \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{S}_k^{-1} \mathbf{H}_k \mathbf{P}_{k|k-1}
+        + \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{S}_k^{-1} \mathbf{H}_k \mathbf{P}_{k|k-1} \\
+        &= \mathbf{P}_{k|k-1}
+        - \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{S}_k^{-1} \mathbf{H}_k \mathbf{P}_{k|k-1} \\
+        &= \mathbf{P}_{k|k-1} - \mathbf{K}_k \mathbf{H}_k \mathbf{P}_{k|k-1} \\
+        &= \left[ \mathbf{I} - \mathbf{K}_k \mathbf{H}_k \right] \mathbf{P}_{k|k-1}
+    \end{aligned}
+\end{equation*}
+
+and so the \textit{a posteriori} state correction estimate error covariance is
+
+\boxed{
+\parbox{\textwidth}{
+\begin{equation}
+    \mathbf{P}_k = \left[ \mathbf{I} - \mathbf{K}_k \mathbf{H}_k \right] \mathbf{P}_{k|k-1}
+    \label{eq:a-posteriori-state-covariance}
+\end{equation}
+}
+}
+
+Although this expression for $\mathbf{P}_k$ is typically the form presented in the Kalman
+filtering literature, its direct implementation is discouraged due to numerical roundoff
+jeopardizing the covariance matrix symmetry, and its use is suitable mainly for academic formulations.
+
+Note that, by remembering that $\mathbf{P}_{k|k-1}^T = \mathbf{P}_{k|k-1}$ and that 
+$\mathbf{S}_k^T = \mathbf{S}_k$, the Kalman gain of (\ref{eq:kalman-gain}) can be
+rearranged as follows
+
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{K}_{k} &= \mathbf{P}_{k|k-1} \, \mathbf{H}_{k}^T \, \mathbf{S}_{k}^{-1} \\
+        \mathbf{K}_{k} \, \mathbf{S}_{k} &= \mathbf{P}_{k|k-1} \, \mathbf{H}_{k}^T \, \mathbf{S}_{k}^{-1} \, \mathbf{S}_{k} \\
+        \mathbf{K}_{k} \, \mathbf{S}_{k} &= \mathbf{P}_{k|k-1} \, \mathbf{H}_{k}^T\\
+        \left( \mathbf{K}_{k} \, \mathbf{S}_{k} \right)^T &= \left( \mathbf{P}_{k|k-1} \, \mathbf{H}_{k}^T \right)^T \\
+        \mathbf{S}_{k} \, \mathbf{K}_{k}^T &= \mathbf{H}_{k} \,\mathbf{P}_{k|k-1}
+    \end{aligned}
+\end{equation*}
+
+and so
+
+\begin{equation*}
+    \mathbf{H}_{k} \,\mathbf{P}_{k|k-1} = \mathbf{S}_{k} \, \mathbf{K}_{k}^T
+\end{equation*}
+
+We can then express $\mathbf{P}_k$ as
+
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{P}_{k} &= \left[ \mathbf{I} - \mathbf{K}_k \mathbf{H}_k \right] \mathbf{P}_{k|k-1} \\
+        &= \mathbf{P}_{k|k-1} - \mathbf{K}_{k} \, \mathbf{H}_{k} \, \mathbf{P}_{k|k-1} \\
+        &= \mathbf{P}_{k|k-1} - \mathbf{K}_{k} \, \mathbf{S}_{k} \, \mathbf{K}_{k}^T
+    \end{aligned}
+\end{equation*}
+
+and so the \textit{a posteriori} state correction estimate error covariance can also be expressed as
+
+\boxed{
+\parbox{\textwidth}{
+\begin{equation}
+    \mathbf{P}_k = \mathbf{P}_{k|k-1} - \mathbf{K}_{k} \, \mathbf{S}_{k} \, \mathbf{K}_{k}^T
+    \label{eq:a-posteriori-state-covariance-quadratic}
+\end{equation}
+}
+}
+
+This expression is quadratic in $\mathbf{K}_k$, and so, like the Joseph form of
+(\ref{eq:a-posteriori-state-covariance-joseph}), it is well-suited numerically for
+ill-conditioned systems. However, the difference between this form and the Joseph form
+is that this form is valid only when $\mathbf{K}_k$ is optimal according to the above
+derivations, whereas the Joseph form is valid for any $\mathbf{K}_k$. Also, because of
+the differencing operation, care must be taken so that $\mathbf{P}_k$ remains positive
+definite. Lastly, it is worth noting that this expression does not rely on $\mathbf{H}_k$.
+
+Given existing values for $\mathbf{x}_{k-1}$ and $\mathbf{P}_{k-1}$, we now have established
+how to determine $\hat{\mathbf{x}}_{k|k-1}$, $\mathbf{P}_{k|k-1}$, $\hat{\mathbf{z}}_{k}$,
+$\tilde{\mathbf{z}}_{k}$, $\mathbf{S}_{k}$, $\mathbf{K}_{k}$, $\hat{\mathbf{x}}_k$,
+and $\mathbf{P}_k$, and so we can therefore specify the Kalman filter algorithm.
+
+The Kalman filter update cycle for an unforced system (i.e., no control input) is
+
+I. Projection (\textit{a priori}) update:
+
+\begin{equation*}
+    \begin{aligned}
+        \hat{\mathbf{x}}_{k|k-1} &= \mathbf{\Phi}_{k|k-1} \hat{\mathbf{x}}_{k-1} \\
+        \mathbf{P}_{k|k-1} &= \mathbf{\Phi}_{k|k-1} \, \mathbf{P}_{k-1} \, \mathbf{\Phi}_{k|k-1}^T + \mathbf{\Gamma}_{k|k-1} \mathbf{Q}_{k-1} \mathbf{\Gamma}_{k|k-1}^T
+    \end{aligned}
+\end{equation*}
+
+II. Correction (\textit{a posteriori}) update:
+
+\begin{equation*}
+    \begin{aligned}
+        \hat{\mathbf{z}}_k &= \mathbf{H}_k \hat{\mathbf{x}}_{k|k-1} \\
+        \tilde{\mathbf{z}}_k &= \mathbf{z}_k - \hat{\mathbf{z}}_k \\
+        \mathbf{S}_{k} &= \mathbf{H}_{k} \, \mathbf{P}_{k|k-1} \, \mathbf{H}_{k}^T + \mathbf{R}_{k} \\
+        \mathbf{K}_{k} &= \mathbf{P}_{k|k-1} \, \mathbf{H}_{k}^T \, \mathbf{S}_{k}^{-1} \\
+        \hat{\mathbf{x}}_k &= \hat{\mathbf{x}}_{k|k-1} +\mathbf{K}_k \, \tilde{\mathbf{z}}_k \\
+        \mathbf{P}_k &= \mathbf{P}_{k|k-1} - \mathbf{K}_{k} \, \mathbf{S}_{k} \, \mathbf{K}_{k}^T
+    \end{aligned}
+\end{equation*}
+
+For a forced input system, the system dynamical and observation modeling equations are
+
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{x}_{k+1} &= \mathbf{\Phi}_{k+1|k} \mathbf{x}_k + \mathbf{u}_k + \mathbf{\Gamma}_{k+1|k} \mathbf{w}_k \\
+        \mathbf{z}_k &= \mathbf{H}_k \mathbf{x}_k + \mathbf{v}_k
+    \end{aligned}
+\end{equation*}
+
+where $\mathbf{u}_k$ is the $n \times 1$ control input sequence, and the only change to
+the Kalman filter update cycle is that the \textit{a priori} state projection estimate becomes
+
+\begin{equation*}
+    \hat{\mathbf{x}}_{k|k-1} = \mathbf{\Phi}_{k|k-1} \hat{\mathbf{x}}_{k-1} + \mathbf{u}_{k-1}
+\end{equation*}
+
+and so the Kalman filter update cycle for a forced input system is
+
+I. Projection (\textit{a priori}) update:
+
+\begin{equation*}
+    \begin{aligned}
+        \hat{\mathbf{x}}_{k|k-1} &= \mathbf{\Phi}_{k|k-1} \hat{\mathbf{x}}_{k-1} + \mathbf{u}_{k-1} \\
+        \mathbf{P}_{k|k-1} &= \mathbf{\Phi}_{k|k-1} \, \mathbf{P}_{k-1} \, \mathbf{\Phi}_{k|k-1}^T + \mathbf{\Gamma}_{k|k-1} \mathbf{Q}_{k-1} \mathbf{\Gamma}_{k|k-1}^T
+    \end{aligned}
+\end{equation*}
+
+II. Correction (\textit{a posteriori}) update:
+
+\begin{equation*}
+    \begin{aligned}
+        \hat{\mathbf{z}}_k &= \mathbf{H}_k \hat{\mathbf{x}}_{k|k-1} \\
+        \tilde{\mathbf{z}}_k &= \mathbf{z}_k - \hat{\mathbf{z}}_k \\
+        \mathbf{S}_{k} &= \mathbf{H}_{k} \, \mathbf{P}_{k|k-1} \, \mathbf{H}_{k}^T + \mathbf{R}_{k} \\
+        \mathbf{K}_{k} &= \mathbf{P}_{k|k-1} \, \mathbf{H}_{k}^T \, \mathbf{S}_{k}^{-1} \\
+        \hat{\mathbf{x}}_k &= \hat{\mathbf{x}}_{k|k-1} +\mathbf{K}_k \, \tilde{\mathbf{z}}_k \\
+        \mathbf{P}_k &= \mathbf{P}_{k|k-1} - \mathbf{K}_{k} \, \mathbf{S}_{k} \, \mathbf{K}_{k}^T
+    \end{aligned}
+\end{equation*}
+
+Before concluding this section, it is worth introducing two additional covariance matrices,
+particularly since they are relevant to the unscented Kalman filter formulation in
+\S\ref{The Unscented Kalman Filter}.
+These two covariances are the observation propagation covariance, $\mathbf{P}_{\mathbf{zz},k}$,
+and the observation-to-state transformation cross covariance, $\mathbf{P}_{\mathbf{xz},k}$.
+
+Let $\mathbf{z}_{NF,k}$ be the noise-free observation term (i.e., the $\mathbf{v}_k$ noise
+sequence is not included)
+
+\begin{equation*}
+    \mathbf{z}_{NF,k} = \mathbf{H}_k \mathbf{x}_k
+\end{equation*}
+
+The noise-free observation residual is
+
+\begin{equation*}
+    \tilde{\mathbf{z}}_{NF,k} = \mathbf{z}_{NF,k} - \hat{\mathbf{z}}_k
+\end{equation*}
+
+Then the observation propagation covariance is determined by
+
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{P}_{\mathbf{zz},k} &= E \left\{ \tilde{\mathbf{z}}_{NF,k} \; \tilde{\mathbf{z}}_{NF,k}^T \right\} \\
+        &= E \left\{ \left[ \mathbf{z}_{NF,k} - \hat{\mathbf{z}}_k \right] \left[ \mathbf{z}_{NF,k} - \hat{\mathbf{z}}_k \right]^T \right\} \\
+        &= E \left\{ \left[ \mathbf{H}_k \mathbf{x}_k - \mathbf{H}_k \hat{\mathbf{x}}_{k|k-1} \right] \left[ \mathbf{H}_k \mathbf{x}_k - \mathbf{H}_k \hat{\mathbf{x}}_{k|k-1} \right]^T \right\} \\
+        &= E \left\{ \left[ \mathbf{H}_k \mathbf{e}_{k|k-1} \right] \left[ \mathbf{H}_k \mathbf{e}_{k|k-1} \right]^T \right\} \\
+        &= E \left\{ \left[ \mathbf{H}_k \mathbf{e}_{k|k-1} \right] \left[ \mathbf{e}_{k|k-1}^T \mathbf{H}_k^T \right] \right\} \\
+        &= \mathbf{H}_k E \left\{ \mathbf{e}_{k|k-1} \mathbf{e}_{k|k-1}^T \right\} \mathbf{H}_k^T \\
+        &= \mathbf{H}_k \mathbf{P}_{k|k-1} \mathbf{H}_k^T
+    \end{aligned}
+\end{equation*}
+
+and so the observation propagation covariance is
+
+\boxed{
+\parbox{\textwidth}{
+\begin{equation}
+    \mathbf{P}_{\mathbf{zz},k} = \mathbf{H}_k \mathbf{P}_{k|k-1} \mathbf{H}_k^T
+    \label{eq:observation-propagation-covariance}
+\end{equation}
+}
+}
+
+As can be seen, then, the covariance of the observation residual (\ref{eq:observation-residual-covariance})
+can be expressed as
+
+\boxed{
+\parbox{\textwidth}{
+\begin{equation}
+    \mathbf{S}_{k} = \mathbf{P}_{\mathbf{zz},k} + \mathbf{R}_{k}
+    \label{eq:observation-residual-covariance-alternate}
+\end{equation}
+}
+}
+
+In other words, $\mathbf{S}_{k}$ is simply the direct addition of the observation
+propagation covariance and the observation error covariance.
+
+The observation-to-state transformation cross covariance is determined by
+
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{P}_{\mathbf{xz},k} &= E \left\{ \mathbf{e}_{k|k-1} \tilde{\mathbf{z}}_k^T \right\} \\
+        &= E \left\{ \mathbf{e}_{k|k-1} \left[ \mathbf{z}_k - \hat{\mathbf{z}}_k \right]^T \right\} \\
+        &= E \left\{ \mathbf{e}_{k|k-1} \left[ \mathbf{H}_k \mathbf{e}_{k|k-1} + \mathbf{v}_k \right]^T \right\} \\
+        &= E \left\{ \mathbf{e}_{k|k-1} \left[ \mathbf{e}_{k|k-1}^T \mathbf{H}_k^T + \mathbf{v}_k^T \right] \right\} \\
+        &= E \left\{ \mathbf{e}_{k|k-1} \mathbf{e}_{k|k-1}^T \mathbf{H}_k^T + \mathbf{e}_{k|k-1} \mathbf{v}_k^T \right\} \\
+        &= E \left\{ \mathbf{e}_{k|k-1} \mathbf{e}_{k|k-1}^T \mathbf{H}_k^T \right\} + E \left\{ \mathbf{e}_{k|k-1} \mathbf{v}_k^T \right\} \\
+        &= E \left\{ \mathbf{e}_{k|k-1} \mathbf{e}_{k|k-1}^T \right\} \mathbf{H}_k^T + \mathbf{0} \\
+        &= \mathbf{P}_{k|k-1} \, \mathbf{H}_{k}^T
+    \end{aligned}
+\end{equation*}
+
+and so the observation-to-state transformation cross covariance is
+
+\boxed{
+\parbox{\textwidth}{
+\begin{equation}
+    \mathbf{P}_{\mathbf{xz},k} = \mathbf{P}_{k|k-1} \, \mathbf{H}_{k}^T
+    \label{eq:observation-state-cross-covariance}
+\end{equation}
+}
+}
+
+Note that, whereas $\mathbf{P}_{\mathbf{zz},k}$ is square (and symmetric),
+$\mathbf{P}_{\mathbf{xz},k}$ is not square.
+
+As can be seen, then, the Kalman filter gain can be expressed in terms of the
+observation-to-state transformation cross covariance
+
+\boxed{
+\parbox{\textwidth}{
+\begin{equation}
+    \mathbf{K}_{k} = \mathbf{P}_{\mathbf{xz},k} \; \mathbf{S}_{k}^{-1}
+    \label{eq:kalman-gain-from-cross-covariance}
+\end{equation}
+}
+}
+
+In other words, the Kalman filter gain is simply the observation-to-state transformation
+cross covariance “divided by” the observation residual covariance. Another viewpoint is
+that the filter gain is simply the cross covariance weighted by the inverse of the residual
+covariance, which is essentially a variance normalization operation.
+
+Observe that, for the linear Kalman filter, the observation estimate, $\hat{\mathbf{z}}_k$,
+observation residual covariance, $\mathbf{S}_k$, and the filter correction gain, $\mathbf{K}_k$,
+are the only calculations that rely on $\mathbf{K}_k$. As we’ve just discovered,
+$\mathbf{P}_{\mathbf{zz},k}$ and $\mathbf{P}_{\mathbf{xz},k}$ are the components of $\mathbf{S}_k$,
+and $\mathbf{K}_k$, respectively, that directly rely on $\mathbf{H}_k$. As will be seen shortly,
+the unscented Kalman filter in \S\ref{The Unscented Kalman Filter} determines
+$\hat{\mathbf{z}}_k$, $\mathbf{P}_{\mathbf{zz},k}$, and $\mathbf{P}_{\mathbf{xz},k}$
+without the relying on $\mathbf{H}_k$.

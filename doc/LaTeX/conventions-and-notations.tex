@@ -1,0 +1,105 @@
+\section{Conventions and Notations}
+\label{Conventions and Notations}
+
+When I began my journey into studying the Kalman filter, my primary reference was the
+"Robert Grover Brown" book \cite{rgbrown1983}, and much of my choice of conventions and
+notations comes from that book. I also heavily relied on Sorenson’s material
+\cite{sorenson1985} which was consistent with R.G. Brown notation. As I accumulated other
+references over the years, I discovered that the Brown/Sorenson conventions and notations
+were dominant. Granted there are other conventions and notations in the Kalman filtering
+literature, but I feel most at home when using the Brown/Sorenson conventions and notations,
+and those are the ones I’ve chosen to adopt in this document.
+
+In particular, $\mathbf{x}_k$ represents a system state vector at time event "$k$",
+$\mathbf{\Phi}_{k+1|k}$ represents a linear state transition matrix that transitions the
+state from time events "$k$" to "$k+1$",
+$\mathbf{z}_k$ represents an observation (i.e., measurement) vector that observes the
+system output at time event "$k$",
+and $\mathbf{H}_k$ represents a linear observation transformation from $\mathbf{x}_k$
+to $\mathbf{z}_k$.
+Additionally, $\mathbf{w}_k$ and $\mathbf{v}_k$ represent random sequences that model the
+system dynamics variations and observation variations, respectively, with covariances
+$\mathbf{Q}_k$ and $\mathbf{R}_k$, respectively.
+Lastly, the system state estimation error covariance is represented by $\mathbf{P}_k$.
+
+In addition to the many different choices of variables in the technical literature, there
+are also many notational styles.
+For instance, instead of using the "$k$" and "$k+1|k$" subscripts, some references use
+functional forms instead, as in "$\mathbf{x}(k)$" and "$\mathbf{\Phi}(k+1|k)$".
+Others use "$+$" and "$-$" indicators to differentiate \textit{a priori} variables from
+\textit{a posteriori} variables, e.g., $\mathbf{P}_k^-$ instead of $\mathbf{P}_{k|k-1}$,
+and $\mathbf{P}_k^+$ instead of $\mathbf{P}_{k|k}$.
+The notations adopted in this document strive to make the equations clear (or as clear
+as they can be) without being "too busy" in the variable descriptors;
+$\mathbf{\Phi}_{k+1|k}$ is more readable in an expression than $\mathbf{\Phi}(k+1|k)$.
+
+There are many references that do not distinguish visually between a scalar quantity and
+a matrix quantity. While this may have been a necessity in the days of typewriters and
+early word processors, it also does the reader an extreme disservice. Knowing that a
+variable is a scalar or a matrix is fundamental in the understanding of an equation or
+derivation, and given today’s technology in word processing and electronic typesetting,
+there is no excuse for not adhering to the accepted conventions where an italic variable,
+$s$, is a scalar quantity, and a boldface variable, $\mathbf{M}$, is a matrix quantity.
+
+I’ve often wondered why this particular choice of variables was picked by certain authors.
+For instance, why use $\mathbf{z}$ for the observation vector when the state vector is
+$\mathbf{x}$ and the natural choice would be to use $\mathbf{y}$ instead? After all,
+that’s what all the classical linear control system theory resources use. And why use
+$\mathbf{H}$ as the linear observation transformation instead of something more consistent
+with classical linear control system theory? My uneducated guess is that using $\mathbf{z}$
+allows for the use of $\mathbf{y}$ to represent additional state values (e.g., hidden
+states) in augmented system formulations, and using $\mathbf{H}$ is simply a natural
+alphabetic progression after $\mathbf{F}$ and $\mathbf{G}$ are assigned for discrete-time
+system functional transformations. For instance, consider the classical continuous-time
+linear system description:
+
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{\dot{x}} &= \mathbf{A} \mathbf{x} + \mathbf{B} \mathbf{u} \\
+        \mathbf{y} &= \mathbf{C} \mathbf{x} + \mathbf{D} \mathbf{u} \\
+    \end{aligned}
+\end{equation*}
+
+where $\mathbf{x}$ is the system state, $\mathbf{u}$ is the control input, and $\mathbf{y}$
+is the output observation. In transforming to a discrete-time description, a natural
+choice of variables would be
+
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{x}_{k+1} &= \mathbf{F}_k \mathbf{x}_k + \mathbf{G}_k \mathbf{u}_k \\
+        \mathbf{z}_k &= \mathbf{H}_k \mathbf{x}_k + \mathbf{J}_k \mathbf{u}_k
+    \end{aligned}
+\end{equation*}
+
+We should stay away from using $\mathbf{E}$ because it could easily be confused with the
+expectation operation $E \left\{ \cdots \right\}$, and we can’t use $\mathbf{I}$ because
+that’s the identity matrix (although I’ve seen some authors use $\mathbf{I}_k$ to represent
+an information matrix value at time event "$k$", causing me horrible confusion), so the
+choices of $\mathbf{H}$ seems to make logical sense. Similarly, the choices for covariance
+values appear to be alphabetically assigned. If $\mathbf{P}$ is our first-assigned covariance,
+then using $\mathbf{Q}$ and $\mathbf{R}$ make sense for the next two assignments. Of course,
+this reasoning behind the assignments is pure conjecture on my part, but it allows me to
+find order in the conventions that I’ve chosen from R.G. Brown and others.
+
+The following list summarizes the general conventions and notations used in this document:
+
+\begin{myitemize}
+    \item An italic variable, $s$, designates a scalar quantity (the variable can be of any case)
+    \item A boldface lower-case variable, $\mathbf{v}$, designates a vector matrix quantity
+    \item A boldface upper-case variable, $\mathbf{M}$, designates a block matrix quantity
+    \item $\mathbf{x}_k$ designates a system state vector at time event "$k$"
+    \item $\hat{\mathbf{x}}_k$ designates an estimate of the system state vector, $\mathbf{x}_k$, at time event "$k$"
+    \item $\mathbf{P}_k$ designates the covariance matrix of the state estimation error, $\mathbf{x}_k - \hat{\mathbf{x}}_k$
+    \item $\mathbf{\Phi}_{k+1|k}$ designates a linear state transition matrix that transitions $\mathbf{x}_k$ from time events "$k$" to "$k+1$"
+    \item $\mathbf{u}_k$ designates a system control input vector at time event "$k$"
+    \item $\mathbf{w}_k$ designates a system process random variation vector at time event "$k$"
+    \item $\mathbf{Q}_k$ designates the covariance matrix of the system process random variation, $\mathbf{w}_k$
+    \item $\mathbf{\Gamma}_{k+1|k}$ designates a linear matrix that transforms $\mathbf{w}_k$ from time events "$k$" to "$k+1$" into the state space of $\mathbf{x}_k$
+    \item $\mathbf{z}_k$ designates an observation (i.e., measurement) vector that observes the system at time event "$k$"
+    \item $\hat{\mathbf{z}}_k$ designates an estimate of the observation vector, $\mathbf{z}_k$, at time event "$k$"
+    \item $\mathbf{R}_k$ designates the covariance matrix of the observation estimation error, $\mathbf{z}_k - \hat{\mathbf{z}}_k$
+    \item $\mathbf{H}_k$ designates a linear observation transformation matrix from the state space of $\mathbf{x}_k$ into the state space of $\mathbf{z}_k$
+    \item $\mathbf{v}_k$ designates an observation random variation vector at time event "$k$"
+    \item $\mathbf{R}_k$ designates the covariance matrix of the observation random variation, $\mathbf{v}_k$
+    \item $\mathbf{K}_k$ designates the state estimation filter gain matrix, i.e., the Kalman gain
+\end{myitemize}

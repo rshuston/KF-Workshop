@@ -1,0 +1,204 @@
+\section{Uncorrelated Observations}
+\label{Uncorrelated Observations}
+
+Given that the observation vector $\mathbf{z}_k$ is of size $m \times 1$, then the size of
+$\mathbf{S}_k$ is $m \times m$.
+When the number of observations is large, e.g., the pseudorange measurements from a
+12-channel GPS receiver, the evaluation of $\mathbf{S}_k^{-1}$ is computationally expensive
+as well as numerically challenging in maintaining its symmetric and positive definite
+characteristics.
+
+If the observations $\mathbf{z}_k$ are uncorrelated, then $\mathbf{R}_k$ is diagonal.
+In this case, the Kalman filter correction operations can be structured as a series of
+sequential scalar operations.
+
+Let us denote the element-wise components of $\mathbf{z}_k$, $\mathbf{H}_k$, and
+$\mathbf{R}_k$ as
+
+\begin{equation*}
+    \mathbf{z}_k =
+    \begin{bmatrix}
+        z^{(1)} \\
+        z^{(2)} \\
+        \vdots \\
+        z^{(m)}
+    \end{bmatrix}_k
+    \phantom{MM}
+    \mathbf{H}_k =
+    \begin{bmatrix}
+        \mathbf{h}^{(1)} \\
+        \mathbf{h}^{(2)} \\
+        \vdots \\
+        \mathbf{h}^{(m)}
+    \end{bmatrix}_k
+    \phantom{MM}
+    \mathbf{R}_k =
+    \begin{bmatrix}
+        r^{(1)} & 0 & \cdots & 0  \\
+        0 & r^{(2)} & \cdots & 0 \\
+        \vdots & \vdots & \ddots & \vdots \\
+        0 & 0 & \cdots & r^{(m)}
+    \end{bmatrix}_k
+\end{equation*}
+
+where $m$ is the observation vector dimension. Observe that $\mathbf{h}^{(i)}$ is a
+$1 \times n$ row vector
+
+\begin{equation*}
+    \mathbf{h}^{(i)} = \left[ h_{i1} \;\; h_{i2} \; \cdots \; h_{in} \right]
+\end{equation*}
+
+where $n$ is the state vector dimension. The sequential correction procedure is given in
+Algorithm \ref{alg:SequentialCorrection} below.
+
+\begin{algorithm}
+    \caption{Sequential Correction}
+    \label{alg:SequentialCorrection}
+    \begin{algorithmic}
+        \STATE $\mathbf{x}^{(0)} = \hat{\mathbf{x}}_{k|k-1}$
+        \STATE $\mathbf{P}^{(0)} = \mathbf{P}_{k|k-1}$
+        \FOR{$i = 1$ \textbf{to} $m$}
+            \STATE $\tilde{z}^{(i)} = z^{(i)} - \mathbf{h}^{(i)} \mathbf{x}^{(i-1)}$
+            \STATE $s^{(i)} = \mathbf{h}^{(i)} \mathbf{P}^{(i-1)} {\mathbf{h}^{(i)}}^T + r^{(i)}$
+            \STATE $\mathbf{k}^{(i)} = \mathbf{P}^{(i-1)} {\mathbf{h}^{(i)}}^T \left( \frac { 1 } { s^{(i)} } \right)$
+            \STATE $\mathbf{x}^{(i)} = \mathbf{x}^{(i-1)} + \mathbf{k}^{(i)} \tilde{z}^{(i)}$
+            \STATE $\mathbf{P}^{(i)}  = \mathbf{P}^{(i-1)} - \mathbf{k}^{(i)} s^{(i)} \mathbf{k}^{(i)^T}$
+        \ENDFOR
+        \STATE $\hat{\mathbf{x}}_{k} = \mathbf{x}^{(m)}$
+        \STATE $\mathbf{P}_{k} = \mathbf{P}^{(m)}$
+    \end{algorithmic}
+\end{algorithm}
+
+Observe that $\tilde{z}^{(i)}$ and $s^{(i)}$ are scalar values.
+The structure of the sequential correction algorithm is such that each $i^{\text{th}}$ step
+can be treated as a “mini-update” that uses the \textit{a posteriori} results of the
+preceding step as its \textit{a priori} input.
+
+If $\mathbf{R}_k$ is not diagonal, i.e., the observations are correlated, then the
+observation relation can be transformed to a new uncorrelated form using U-D factorization.
+It is well-known that any $n \times n$ symmetric matrix, $\mathbf{M}$, can be factorized
+into a unit upper triangular matrix, $\mathbf{U}$, and a diagonal matrix, $\mathbf{D}$,
+such that
+
+\begin{equation*}
+    \mathbf{M} = \mathbf{U} \mathbf{D} \mathbf{U}^T
+\end{equation*}
+
+where $\mathbf{U}$ and $\mathbf{D}$ are of the forms
+
+\begin{equation*}
+    \mathbf{U} =
+    \begin{bmatrix}
+        1 & u_{12} & u_{13} &\cdots & u_{1n} \\
+        0 & 1 & u_{23} &\cdots & u_{2n} \\
+        0 & 0 & 1 &\cdots & u_{3n} \\
+        \vdots & \vdots & \vdots & \ddots & \vdots \\
+        0 & 0 & 0 & \cdots & 1
+    \end{bmatrix}
+    \phantom{MM}
+    \mathbf{D} =
+    \begin{bmatrix}
+        d_{11} & 0 & 0 &\cdots & 0 \\
+        0 & d_{22} & 0 &\cdots & 0 \\
+        0 & 0 & d_{33} &\cdots & 0 \\
+        \vdots & \vdots & \vdots & \ddots & \vdots \\
+        0 & 0 & 0 & \cdots & d_{nn}
+    \end{bmatrix}
+\end{equation*}
+
+There are two useful properties to observe about unit triangular matrices:
+
+\begin{myitemize}
+    \item The determinant of a unit triangular matrix is 1. Therefore, $\mathbf{U}^{-1}$
+    exists.
+    \item The inverse of a unit triangular matrix is also a unit triangular matrix, and
+    it has the same structure as the non-inverted matrix. So $\mathbf{U}^{-1}$ is also a
+    unit upper triangular matrix.
+\end{myitemize}
+
+Now, let us suppose that our observation equation
+
+\begin{equation*}
+    \mathbf{z}_k = \mathbf{H}_k \mathbf{x}_k + \mathbf{v}_k
+\end{equation*}
+
+has correlated observation errors and, therefore, $\mathbf{R}_{k}$ is not diagonal. We
+then use the factorization:
+
+\begin{equation*}
+    \mathbf{R}_k = \mathbf{U}_R \mathbf{D}_R \mathbf{U}_R^T
+\end{equation*}
+
+Because $\mathbf{U}_R$ is a triangular matrix, we can use back-substitution methods for
+solving linear equations to transform $\mathbf{z}_k$ into a new value, $\mathbf{\acute{z}}_k$:
+
+\begin{equation*}
+    \mathbf{U}_R \mathbf{\acute{z}}_k = \mathbf{z}_k
+\end{equation*}
+
+Recall that we know that $\mathbf{U}_R^{-1}$ exists. Then
+
+\begin{equation*}
+    \begin{aligned}
+    \mathbf{\acute{z}}_k &= \mathbf{U}_R^{-1} \mathbf{z}_k \\
+    &= \mathbf{U}_R^{-1} \left[ \mathbf{H}_k \mathbf{x}_k + \mathbf{v}_k \right] \\
+    &= \mathbf{U}_R^{-1} \mathbf{H}_k \mathbf{x}_k + \mathbf{U}_R^{-1} \mathbf{v}_k \\
+    &= \mathbf{\acute{H}}_k \mathbf{x}_k + \mathbf{\acute{v}}_k
+    \end{aligned}
+\end{equation*}
+
+The covariance of the transformed noise sequence $\mathbf{\acute{v}}_k$ is
+
+\begin{equation*}
+    \begin{aligned}
+    \mathbf{\acute{R}}_k &= E \left\{ \mathbf{\acute{v}}_k \mathbf{\acute{v}}_k^T \right\} \\
+    &= E \left\{ \left[ \mathbf{U}_R^{-1} \mathbf{v}_k \right] \left[ \mathbf{U}_R^{-1} \mathbf{v}_k \right]^T \right\} \\
+    &= E \left\{ \left[ \mathbf{U}_R^{-1} \mathbf{v}_k \right] \left[ \mathbf{v}_k^T \mathbf{U}_R^{-T} \right] \right\} \\
+    &= \mathbf{U}_R^{-1} E \left\{ \mathbf{v}_k \mathbf{v}_k^T \right\} \mathbf{U}_R^{-T} \\
+    &= \mathbf{U}_R^{-1} \mathbf{R}_k \mathbf{U}_R^{-T} \\
+    &= \mathbf{U}_R^{-1} \left[ \mathbf{U}_R \mathbf{D}_R \mathbf{U}_R^T \right] \mathbf{U}_R^{-T} \\
+    &= \mathbf{D}_R
+    \end{aligned}
+\end{equation*}
+
+So $\mathbf{\acute{R}}_k$ is indeed diagonal. Also, observe that we do not need to
+compute $\mathbf{U}_R^{-1}$ in order to determine $\mathbf{\acute{z}}_k$ and
+$\mathbf{\acute{H}}_k$. Instead, we simply use back-substitution to solve both
+
+\begin{equation*}
+    \mathbf{U}_R \mathbf{\acute{z}}_k = \mathbf{z}_k
+\end{equation*}
+
+and
+
+\begin{equation*}
+    \mathbf{U}_R \mathbf{\acute{H}}_k = \mathbf{H}_k
+\end{equation*}
+
+The algorithm that factorizes $\mathbf{M}$ into its $\mathbf{U}$ and $\mathbf{D}$ factors
+is known as the modified Cholesky decomposition algorithm (named after André-Louis Cholesky).
+Algorithm \ref{alg:UDFactorization} below specifies the factorization procedure.
+
+\begin{algorithm}
+    \caption{U-D Factorization}
+    \label{alg:UDFactorization}
+    \begin{algorithmic}
+        \FOR{$j = n$ \textbf{to} $1$ \textbf{by} $-1$}
+            \FOR{$i = j$ \textbf{to} $1$ \textbf{by} $-1$}
+                \STATE $\sigma = \mathbf{M}_{ij}$
+                \FOR{$k = j+1$ \textbf{to} $n$}
+                    \STATE $\sigma = \sigma - \mathbf{U}_{ik} * \mathbf{D}_{kk} * \mathbf{U}_{jk}$
+                \ENDFOR
+                \IF{$i = j$}
+                    \STATE $\mathbf{U}_{jj} = 1$
+                    \STATE $\mathbf{D}_{jj} = \sigma$
+                \ELSE
+                    \STATE $\mathbf{U}_{ij} = \sigma / \mathbf{D}_{jj}$
+                    \STATE $\mathbf{U}_{ji} = 0$
+                    \STATE $\mathbf{D}_{ij} = 0$
+                    \STATE $\mathbf{D}_{ji} = 0$
+                \ENDIF
+            \ENDFOR
+        \ENDFOR
+    \end{algorithmic}
+\end{algorithm}

@@ -1,0 +1,171 @@
+\documentclass[12pt]{article}
+
+\usepackage[margin=1.0in]{geometry}
+\usepackage[parfill]{parskip}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage[font=bf]{caption}
+\usepackage{changepage}
+\usepackage{hyperref}
+
+
+
+%-------------------------------------------------------------------------------
+\begin{document}
+%-------------------------------------------------------------------------------
+
+
+
+\setlength{\parskip}{12pt}      % set paragraph skipping to one whole line
+\setlength{\tabcolsep}{12pt}    % give some room between table columns
+\hfuzz=60pt                     % give a little margin room for the double-column tables
+
+
+
+% establish a condensed itemized list format
+\newenvironment{myitemize}
+{ \begin{itemize}
+    \setlength{\itemsep}{0pt}
+    \setlength{\parskip}{0pt}
+    \setlength{\parsep}{0pt}     }
+{ \end{itemize}                  } 
+
+
+
+% establish theorem and lemma formats
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+
+
+
+\begin{titlepage}
+    \begin{center}
+        \vspace*{\fill}
+        
+        \huge
+        The Kalman Filter \\
+        
+        \large
+        An Adventure in Derivation
+        
+        \vspace{24pt}
+        
+        \large
+        Robert S. Huston \\
+        Pinpoint Dynamics, LLC \\
+        
+        \vspace{24pt}
+        
+        \today
+        
+        \vspace{24pt}
+        
+        \large
+        Copyright © 2024, 2025 Robert S. Huston. All rights reserved.
+        
+        \vfill
+    \end{center}
+\end{titlepage}
+
+
+
+\begin{abstract}
+This document presents an assorted collection of derivations and notes pertaining to the
+Kalman filter. They are targeted to the practicing engineer who has been tasked with
+developing and implementing a Kalman filtering solution. The mathematical derivations are
+intended to eliminate the mysteries of how and why the Kalman filter works. In addition,
+the document presents the various versions of the Kalman filter and offers some key
+implementation strategies.
+\end{abstract}
+
+
+
+\clearpage
+
+
+
+\begin{adjustwidth}{1in}{1in}
+    \vspace*{\fill}
+    
+    \textit{
+        So I jump ship in Hong Kong and I make my way over to Tibet, and I get on as a
+        looper at a course over in the Himalayas.
+        A looper, you know, a caddy, a looper, a jock. So, I tell them I'm a pro jock,
+        and who do you think they give me? The Dalai Lama, himself. Twelfth son of the Lama.
+        The flowing robes, the grace, bald...striking. So, I'm on the first tee with him.
+        I give him the driver. He hauls off and whacks one - big hitter, the Lama - long,
+        into a ten-thousand foot crevasse, right at the base of this glacier.
+        Do you know what the Lama says? "Gunga galunga...gunga, gunga-lagunga."
+        So we finish the eighteenth and he's gonna stiff me. And I say, "Hey, Lama, hey,
+        how about a little something, you know, for the effort, you know."
+        And he says, "Oh, uh, there won't be any money, but when you die, on your deathbed,
+        you will receive total consciousness." So I got that goin' for me, which is nice.
+    }
+    
+    - Carl Spackler (Bill Murray, "Caddyshack" - 1980)
+    
+    \vfill
+\end{adjustwidth}
+
+
+
+\clearpage
+
+
+
+\tableofcontents
+
+
+
+\clearpage
+
+
+
+\include{introduction}
+\clearpage
+
+\include{conventions-and-notations}
+\clearpage
+
+\include{weighted-least-squares}
+\clearpage
+
+\include{kalman-filter}
+\clearpage
+
+\include{information-kalman-filter}
+\clearpage
+
+\include{steady-state-kalman-filter}
+\clearpage
+
+\include{relationship-to-least-squares}
+\clearpage
+
+\include{quadratic-factors}
+\clearpage
+
+\include{uncorrelated-observations}
+\clearpage
+
+\include{ud-factorized-kalman-filter}
+\clearpage
+
+\include{extended-kalman-filter}
+\clearpage
+
+\include{unscented-kalman-filter}
+\clearpage
+
+\include{references}
+\clearpage
+
+
+
+%-------------------------------------------------------------------------------
+\end{document}
+%-------------------------------------------------------------------------------

@@ -1,0 +1,54 @@
+\section{Quadratic Factors}
+\label{Quadratic Factors}
+
+One of the critical computation objectives is the preservation of the symmetric and
+positive definite characteristics of the covariance matrices. In particular, there are
+three matrices of interest: $\mathbf{P}_{k|k-1}$, $\mathbf{S}_k$, and $\mathbf{P}_k$.
+Recalling the expressions for each of these from
+(\ref{eq:a-priori-state-covariance}),
+(\ref{eq:observation-residual-covariance}),
+and (\ref{eq:a-posteriori-state-covariance-quadratic}),
+respectively, we have
+
+\begin{equation*}
+    \begin{aligned}
+        & \mathbf{P}_{k|k-1} = \mathbf{\Phi}_{k|k-1} \, \mathbf{P}_{k-1} \, \mathbf{\Phi}_{k|k-1}^T + \mathbf{\Gamma}_{k|k-1} \mathbf{Q}_{k-1} \mathbf{\Gamma}_{k|k-1}^T \\
+        & \mathbf{S}_{k} = \mathbf{H}_{k} \, \mathbf{P}_{k|k-1} \, \mathbf{H}_{k}^T + \mathbf{R}_{k} \\
+        & \mathbf{P}_k = \mathbf{P}_{k|k-1} - \mathbf{K}_{k} \, \mathbf{S}_{k} \, \mathbf{K}_{k}^T
+    \end{aligned}
+\end{equation*}
+
+Observe that each of these contains one or more quadratic terms of the form $\mathbf{C} = \mathbf{A} \mathbf{B} \mathbf{A}^T$,
+where $\mathbf{B}$ is a square, symmetric matrix. Hence, $\mathbf{C}$ is also a square,
+symmetric matrix. Let $\mathbf{A}$ be of dimension $m \times n$ and $\mathbf{B}$ be of
+dimension $n \times n$. Then $\mathbf{C}$ will be of dimension $m \times m$.
+
+Algorithm \ref{alg:QuadraticMultiply} below gives a procedure to compute
+computing $\mathbf{C} = \mathbf{A} \mathbf{B} \mathbf{A}^T$ while preserving symmetry.
+
+\begin{algorithm}
+    \caption{Quadratic Multiply}
+    \label{alg:QuadraticMultiply}
+    \begin{algorithmic}
+        \FOR{$i = 1$ \textbf{to} $m$}
+            \STATE $\sigma = 0$
+            \FOR{$j = 1$ \textbf{to} $n$}
+                \FOR{$k = 1$ \textbf{to} $n$}
+                    \STATE $\sigma = \sigma + \mathbf{A}_{ij} * \mathbf{B}_{jk} * \mathbf{A}_{ik}$
+                \ENDFOR
+            \ENDFOR
+            \STATE $\mathbf{C}_{ii} = \sigma$
+            \FOR{$l = i+1$ \textbf{to} $m$}
+                \STATE $\sigma = 0$
+                \FOR{$j = 1$ \textbf{to} $n$}
+                    \FOR{$k = 1$ \textbf{to} $n$}
+                        \STATE $\sigma = \sigma + \mathbf{A}_{ij} * \mathbf{B}_{jk} * \mathbf{A}_{lk}$
+                    \ENDFOR
+                \ENDFOR
+                \STATE $\mathbf{C}_{il} = \sigma$
+                \STATE $\mathbf{C}_{li} = \sigma$
+            \ENDFOR
+        \ENDFOR
+    \end{algorithmic}
+\end{algorithm}
+

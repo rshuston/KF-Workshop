@@ -1,0 +1,149 @@
+\section{The Unscented Kalman Filter}
+\label{The Unscented Kalman Filter}
+
+Consider the nonlinear system dynamical process model
+
+\begin{equation*}
+    \mathbf{x}_{k+1} = \mathbf{f} \left( \mathbf{x}_k \right) + \mathbf{\Gamma}_{k+1|k} \mathbf{w}_k
+\end{equation*}
+
+where $\mathbf{x}$ is an $n \times 1$ state vector, $\mathbf{f}()$ is an $n \times 1$
+matrix function, $\mathbf{\Gamma}$ is an $n \times p$ transformation matrix, and $\mathbf{w}_k$
+is a $p \times 1$ white noise sequence with covariance
+
+\begin{equation*}
+    E \left\{ \mathbf{w}_k \mathbf{w}_k^T \right\} = \mathbf{Q}_k
+\end{equation*}
+
+and the nonlinear observation model
+
+\begin{equation*}
+    \mathbf{z}_k = \mathbf{h} \left( \mathbf{x}_k \right) + \mathbf{v}_k
+\end{equation*}
+
+where $\mathbf{z}$ is an $m \times 1$ vector, $\mathbf{h}()$ is an $m \times 1$ matrix
+function, and $\mathbf{v}_k$ is an $m \times 1$ white noise sequence with covariance
+
+\begin{equation*}
+    E \left\{ \mathbf{v}_k \mathbf{v}_k^T \right\} = \mathbf{R}_k
+\end{equation*}
+
+The process and observation noise sequences are uncorrelated
+
+\begin{equation*}
+    E \left\{ \mathbf{w}_j \mathbf{v}_k^T \right\} = \mathbf{0} \, , \phantom{.} \mathrm{for} \, \mathrm{all} \, j \, \mathrm{and} \, k
+\end{equation*}
+
+Recall that the extended Kalman filter in \S\ref{The Extended Kalman Filter} approximates
+the nonlinear transformations with first-order Taylor coefficient matrices. There are
+situations where these approximations can be inadequate in sufficiently modeling the
+system dynamics and observation models, impacting the quality of the Kalman filter
+performance. The unscented Kalman filter attempts to address these shortcomings by
+relying on the notion that
+\textit{it is better to approximate a probability distribution than to approximate a nonlinear transformation}.
+The basic approach is to use the standard deviations derived from the square root of the
+variances of the state estimation error covariance, $\mathbf{P}$, to generate a set of
+"sigma points" that approximate the probability distributions of the process and
+observation operations. These sigma points are then used in weighted sum calculations
+to generate the necessary quantities needed for the Kalman filter update operations.
+
+We begin with the set of $2n + 1$ weighting factors $\left\{ W^{(0)}, W^{(1)}, ..., W^{(2n)} \right\}$,
+where, in order to provide unbiased estimates, the weighting factors must sum to unity
+
+\begin{equation*}
+    \sum_{j=0}^{2n} W^{(j)} = 1
+\end{equation*}
+
+We can choose $W^{(0)}$ based on an empirical criteria. The remaining $2n$ weights are
+then obtained from
+
+\begin{equation*}
+    W^{(j)} = \frac{1 - W^{(0)}}{2 n} \; , j=1,\dots,2n
+\end{equation*}
+
+The $2n + 1$ sigma points, $\mathbf{X}^{(j)}$, for $\hat{\mathbf{x}}_{k-1}$ and $\mathbf{P}_{k-1}$
+are determined from:
+
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{L}_{k-1} &= \sqrt{ \frac{n}{1 - W^{(0)}} \, \mathbf{P}_{k-1} } \\
+        \phantom{X} \\
+        \mathbf{X}^{(0)} &= \hat{\mathbf{x}}_{k-1} \\
+        \mathbf{X}^{(i)} &= \hat{\mathbf{x}}_{k-1} + \left[ \mathbf{L}_{k-1} \right]_i \; , i=1,\dots,n \\
+        \mathbf{X}^{(i+n)} &= \hat{\mathbf{x}}_{k-1} - \left[ \mathbf{L}_{k-1} \right]_i \; , i=1,\dots,n
+    \end{aligned}
+\end{equation*}
+
+where $\sqrt{\mathbf{M}}$ is the lower triangular Cholesky decomposition of the symmetric
+matrix $\mathbf{M}$, and $\left[ \mathbf{L} \right]_i$ is the $i^{\, \text{th}}$ column
+of the lower triangular matrix $\mathbf{L}$. Basically, $\left[ \mathbf{L} \right]_i$
+represents the estimation error standard deviation matrix of the $i^{\, \text{th}}$
+component of $\hat{\mathbf{x}}_{k-1}$.
+
+The primary weight, $W^{(0)}$, controls the spread of the sigma points. $W^{(0)} < 0$ moves
+the sigma points closer to the distribution origin, whereas $W^{(0)} > 0$ moves the sigma
+points further from the distribution origin.
+
+One suggested approach by Julier and Uhlmann \cite{julieruhlmann1997} for choosing the
+weights is to set $W^{(0)}$ to
+
+\begin{equation*}
+    W^{(0)} = \frac{\kappa}{n + \kappa}
+\end{equation*}
+
+Then the remaining $2n$ weights become
+
+\begin{equation*}
+    W^{(j)} = \frac{1}{2 (n + \kappa)} \; , j=1,\dots,2n
+\end{equation*}
+
+and $\mathbf{L}_{k-1}$ becomes
+
+\begin{equation*}
+    \mathbf{L}_{k-1} = \sqrt{ (n + \kappa) \, \mathbf{P}_{k-1} }
+\end{equation*}
+
+The value $\kappa$ is used to "fine tune" the higher order moments of the distribution
+approximation. When the distribution is assumed to be Gaussian, then $\kappa$ should be
+chosen so that
+
+\begin{equation*}
+    n + \kappa = 3
+\end{equation*}
+
+Given a set of $2n + 1$ weighting factors, $W^{(j)}$, and a set of $2n + 1$ sigma points,
+$\mathbf{X}^{(j)}$, the unscented Kalman filter update cycle for a nonlinear system is
+
+I. Projection (\textit{a priori}) update:
+
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{x}^{(j)} &= \mathbf{f} \left( \mathbf{X}^{(j)} \right) \; , j=0,\dots,2n \\
+        \hat{\mathbf{x}}_{k|k-1} &= \sum_{j=0}^{2n} W^{(j)} \mathbf{x}^{(j)} \\
+        \phantom{X} \\
+        \mathbf{P}_{k|k-1} &= \sum_{j=0}^{2n} W^{(j)} \left[ \mathbf{x}^{(j)} - \hat{\mathbf{x}}_{k|k-1} \right] \left[ \mathbf{x}^{(j)} - \hat{\mathbf{x}}_{k|k-1} \right]^T
+        + \mathbf{\Gamma}_{k|k-1} \mathbf{Q}_{k-1} \mathbf{\Gamma}_{k|k-1}^T
+    \end{aligned}
+\end{equation*}
+
+II. Correction (\textit{a posteriori}) update:
+
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{z}^{(j)} &= \mathbf{h} \left( \mathbf{x}^{(j)} \right) \; , j=0,\dots,2n \\
+        \hat{\mathbf{z}}_k &= \sum_{j=0}^{2n} W^{(j)} \mathbf{z}^{(j)} \\
+        \phantom{X} \\
+        \tilde{\mathbf{z}}_k &= \mathbf{z}_k - \hat{\mathbf{z}}_k \\
+        \phantom{X} \\
+        \mathbf{P}_{\mathbf{zz},k} &= \sum_{j=0}^{2n} W^{(j)} \left[ \mathbf{z}^{(j)} - \hat{\mathbf{z}}_k \right] \left[ \mathbf{z}^{(j)} - \hat{\mathbf{z}}_k \right]^T \\
+        \mathbf{P}_{\mathbf{xz},k} &= \sum_{j=0}^{2n} W^{(j)} \left[ \mathbf{x}^{(j)} - \hat{\mathbf{x}}_{k|k-1} \right] \left[ \mathbf{z}^{(j)} - \hat{\mathbf{z}}_k \right]^T \\
+        \phantom{X} \\
+        \mathbf{S}_{k} &= \mathbf{P}_{\mathbf{zz},k} + \mathbf{R}_{k} \\
+        \mathbf{K}_{k} &= \mathbf{P}_{\mathbf{xz},k} \; \mathbf{S}_{k}^{-1} \\
+        \phantom{X} \\
+        \hat{\mathbf{x}}_{k} &= \hat{\mathbf{x}}_{k|k-1} +\mathbf{K}_k \, \tilde{\mathbf{z}}_k \\
+        \mathbf{P}_{k} &= \mathbf{P}_{k|k-1} - \mathbf{K}_k \, \mathbf{S}_k \, \mathbf{K}_k^T
+    \end{aligned}
+\end{equation*}
+
+

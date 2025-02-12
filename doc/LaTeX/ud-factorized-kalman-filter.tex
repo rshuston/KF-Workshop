@@ -1,0 +1,295 @@
+\section{The U-D Factorized Kalman Filter}
+\label{The U-D Factorized Kalman Filter}
+
+As should be apparent, preservation of the integrity of the Kalman filter projection and
+correction computations is essential, especially when it comes to the $\mathbf{P}$ matrix.
+While using a quadratic matrix computation algorithm is clearly an appropriate
+implementation strategy, there are times when that is not enough. For instance, if the
+numerical range of the numbers challenges the precision range of double-precision
+floating-point storage, the behavior of the implemented filter can still be compromised.
+
+One strategy of addressing the numerical range restrictions and floating-point roundoff
+errors is to maintain a matrix square root of the $\mathbf{P}$ matrix rather than
+$\mathbf{P}$ itself. Basically this compands the dynamic range of $\mathbf{P}$ into a
+more manageable range (the square root of very large numbers become smaller numbers, and
+the square root of very small numbers become larger numbers). It also guarantees that
+$\mathbf{P}$ remains symmetric and positive definite.
+
+In practice, instead of using a matrix square root for $\mathbf{P}$, a factorized form of
+$\mathbf{P}$ is used. Factorized algorithms provide better numerical stability, and they
+avoid the need to compute square root values. One of the more popular approaches is to use
+U-D factorization.
+
+We begin the U-D Kalman filter algorithm description by identifying the items to be
+maintained:
+
+\begin{tabular}{l l}
+$\hat{\mathbf{x}}_k$ & state estimate at time event $k$ \\
+$\mathbf{U}_{P,k}$   & U factor of $\mathbf{P}_k = \mathbf{U}_{P,k} \mathbf{D}_{P,k} \mathbf{U}_{P,k}^T$ at time event $k$ \\
+$\mathbf{D}_{P,k}$   & D factor of $\mathbf{P}_k = \mathbf{U}_{P,k} \mathbf{D}_{P,k} \mathbf{U}_{P,k}^T$ at time event $k$
+\end{tabular}
+
+The procedure relies on two subalgorithms: \textit{UDProject} and \textit{UDCorrect}.
+Both of these subalgorithms are specified below. In addition, the U-D Kalman filter
+algorithm relies on $\mathbf{R}_k$ being diagonal, so the diagonalization procedure given
+in \S\ref{Uncorrelated Observations} should be used if the observations are correlated.
+
+I. Projection (\textit{a priori}) update:
+
+\begin{tabular}{l l}
+\phantom{.} & Compute $\hat{\mathbf{x}}_{k|k-1} = \mathbf{\Phi}_{k|k-1} \hat{\mathbf{x}}_{k-1}$ \\
+\phantom{.} & Factor $\mathbf{Q}_{k-1}$ into $\mathbf{U}_{Q,k-1}$ and $\mathbf{D}_{Q,k-1}$ such that
+    $\mathbf{Q}_{k-1} = \mathbf{U}_{Q,k-1} \mathbf{D}_{Q,k-1} \mathbf{U}_{Q,k-1}^T$\\
+\phantom{.} & \phantom{MM} (this can be done just once if $\mathbf{\Gamma}$ and $\mathbf{Q}$ are static) \\
+\phantom{.} & Form $\mathbf{F}_k = \mathbf{\Phi}_{k|k-1} \mathbf{U}_{P,k-1}$\\
+\phantom{.} & Form $\mathbf{G}_k = \mathbf{\Gamma}_{k|k-1} \mathbf{U}_{Q,k-1}$\\
+\phantom{.} & Use \textit{UDProject} to propagate $\mathbf{U}_{P,k-1}$ and $\mathbf{D}_{P,k-1}$
+    to $\mathbf{U}_{P,k|k-1}$ and $\mathbf{D}_{P,k|k-1}$
+\end{tabular}
+
+II. Correction (\textit{a posteriori}) update:
+
+\begin{tabular}{l l}
+\phantom{.} & $\mathbf{x}^{(0)} = \hat{\mathbf{x}}_{k|k-1}$ \\
+\phantom{.} & $\mathbf{U}_P^{(0)} = \mathbf{U}_{P,k|k-1}$ \\
+\phantom{.} & $\mathbf{D}_P^{(0)} = \mathbf{D}_{P,k|k-1}$ \\
+\phantom{.} & \textbf{for} $i = 1$ \textbf{to} $m$ \textbf{do} \\
+\phantom{.} & \phantom{MM} Form ${\delta} = {z}^{(i)} - \mathbf{h}^{(i)} \mathbf{x}^{(i-1)}$ \\
+\phantom{.} & \phantom{MM} Use \textit{UDCorrect} to update $\mathbf{x}^{(i-1)}$, $\mathbf{U}_P^{(i-1)}$,
+    and $\mathbf{D}_P^{(i-1)}$ to $\mathbf{x}^{(i)}$, $\mathbf{U}_P^{(i)}$, and $\mathbf{D}_P^{(i)}$ \\
+\phantom{.} & \textbf{end for} \\
+\phantom{.} & $\hat{\mathbf{x}}_{k} = \mathbf{x}^{(m)}$ \\
+\phantom{.} & $\mathbf{U}_{P,k} = \mathbf{P}_P^{(m)}$ \\
+\phantom{.} & $\mathbf{D}_{P,k} = \mathbf{D}_P^{(m)}$
+\end{tabular}
+
+The \textit{UDProject} subalgorithm is based on Thornton’s Modified Weighted Gram-Schmidt (MWGS)
+Orthogonalization procedure \cite{thornton1976}.
+
+Recall the Kalman covariance projection update:
+
+\begin{equation*}
+    \mathbf{P}_{k|k-1} = \mathbf{\Phi}_{k|k-1} \mathbf{P}_{k-1} \mathbf{\Phi}_{k|k-1}^T + \mathbf{\Gamma}_{k|k-1} \mathbf{Q}_{k-1} \mathbf{\Gamma}_{k|k-1}^T
+\end{equation*}
+
+Substituting the U-D factors for $\mathbf{P}$ and $\mathbf{Q}$ gives
+
+\begin{equation*}
+    \begin{aligned}
+        & \mathbf{U}_{P,k|k-1} \mathbf{D}_{P,k|k-1} \mathbf{U}_{P,k|k-1}^T \\
+        & \phantom{MMM} = \mathbf{\Phi}_{k|k-1} \mathbf{U}_{P,k-1} \mathbf{D}_{P,k-1} \mathbf{U}_{P,k-1}^T \mathbf{\Phi}_{k|k-1}^T
+        + \mathbf{\Gamma}_{k|k-1} \mathbf{U}_{Q,k-1} \mathbf{D}_{Q,k-1} \mathbf{U}_{Q,k-1}^T \mathbf{\Gamma}_{k|k-1}^T
+    \end{aligned}
+\end{equation*}
+
+Define
+
+\begin{equation*}
+    \begin{aligned}
+        & \mathbf{F} = \mathbf{\Phi}_{k|k-1} \mathbf{U}_{P,k-1} \\
+        &\phantom{.} \\
+        & \mathbf{G} = \mathbf{\Gamma}_{k|k-1} \mathbf{U}_{Q,k-1}
+    \end{aligned}
+\end{equation*}
+
+Then
+
+\begin{equation*}
+    \mathbf{U}_{P,k|k-1} \mathbf{D}_{P,k|k-1} \mathbf{U}_{P,k|k-1}^T
+    = \mathbf{F} \mathbf{D}_{P,k-1} \mathbf{F}^T
+    + \mathbf{G} \mathbf{D}_{Q,k-1} \mathbf{G}^T
+\end{equation*}
+
+Define the block matrices
+
+\begin{equation*}
+    \begin{aligned}
+        &\mathbf{A} =
+        \begin{bmatrix}
+         \mathbf{F} & \mathbf{G}
+        \end{bmatrix} \\
+        &\phantom{.} \\
+        &\mathbf{W} =
+        \begin{bmatrix}
+         \mathbf{D}_{P,k-1} & \mathbf{0} \\
+         \mathbf{0} & \mathbf{D}_{Q,k-1}
+        \end{bmatrix}
+    \end{aligned}
+\end{equation*}
+
+Then
+
+\begin{equation*}
+    \mathbf{U}_{P,k|k-1} \mathbf{D}_{P,k|k-1} \mathbf{U}_{P,k|k-1}^T = \mathbf{A} \mathbf{W} \mathbf{A}^T
+\end{equation*}
+
+The Thornton MWGS algorithm performs a weighted Gram-Schmidt orthogonalization on the row
+vectors of $\mathbf{A}$ using $\mathbf{W}$ as the weighting matrix. The result is a unit
+lower triangular matrix, $\mathbf{L}$ and a diagonal coefficient matrix $\mathbf{D}_L$,
+such that
+
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{U}_{P,k|k-1} &= \mathbf{L}^T \\
+        \mathbf{D}_{P,k|k-1} &= \mathbf{D}_L
+    \end{aligned}
+\end{equation*}
+
+It should be noted that, although the primary purpose of Gram-Schmidt orthogonalization is
+to compute an optimal set of orthogonal basis vectors for a general set of basis vectors,
+it is the transformation matrices $\mathbf{L}$ and $\mathbf{D}_L$ that get produced as
+by-products of the procedure that we’re interested in here.
+
+The \textit{UDProject} subalgorithm of Algorithm \ref{alg:UDProject} below implements the
+Thornton MWGS algorithm. The inputs to the subalgorithm are
+
+\begin{tabular}{l l}
+\phantom{.} & $\mathbf{F} = \mathbf{\Phi}_{k|k-1} \mathbf{U}_{P,k-1}$ \\
+\phantom{.} & $\mathbf{G} = \mathbf{\Gamma}_{k|k-1} \mathbf{U}_{Q,k-1}$ \\
+\phantom{.} & $\mathbf{D}_{P,k-1}$ \\
+\phantom{.} & $\mathbf{D}_{Q,k-1}$
+\end{tabular}
+
+and the outputs are:
+
+\begin{tabular}{l l}
+\phantom{.} & $\mathbf{U}_{P,k|k-1}$ \\
+\phantom{.} & $\mathbf{D}_{P,k|k-1}$
+\end{tabular}
+
+\begin{algorithm}
+    \caption{UDProject}
+    \label{alg:UDProject}
+    \begin{algorithmic}
+        \STATE Use $\mathbf{d}$ as an $n \times 1$ scratchpad vector
+        \FOR{$i = n$ \textbf{to} $1$ \textbf{by} $-1$}
+            \STATE $\sigma = 0$
+            \FOR{$j = 1$ \textbf{to} $n$}
+                \STATE $\sigma = \sigma + \mathbf{F}_{ij} * \mathbf{D}_{P,jj} * \mathbf{F}_{ij}$
+            \ENDFOR
+            \FOR{$j = 1$ \textbf{to} $p$}
+                \STATE $\sigma = \sigma + \mathbf{G}_{ij} * \mathbf{D}_{Q,jj} * \mathbf{G}_{ij}$
+            \ENDFOR
+            \STATE $\mathbf{d}_{i} = \sigma$
+            \STATE $\mathbf{U}_{P,ii} = 1$
+            \FOR{$j = 1$ \textbf{to} $i-1$}
+                \STATE $\sigma = 0$
+                \FOR{$k = 1$ \textbf{to} $n$}
+                    \STATE $\sigma = \sigma + \mathbf{F}_{ik} * \mathbf{D}_{P,kk} * \mathbf{F}_{jk}$
+                \ENDFOR
+                \FOR{$k = 1$ \textbf{to} $p$}
+                    \STATE $\sigma = \sigma + \mathbf{G}_{ik} * \mathbf{D}_{Q,kk} * \mathbf{G}_{jk}$
+                \ENDFOR
+                \STATE $\mathbf{U}_{P,ji} = \sigma / \mathbf{d}_{i}$
+                \FOR{$k = 1$ \textbf{to} $n$}
+                    \STATE $\mathbf{F}_{jk} = \mathbf{F}_{jk} - \mathbf{U}_{P,ji} * \mathbf{F}_{ik}$
+                \ENDFOR
+                \FOR{$k = 1$ \textbf{to} $p$}
+                    \STATE $\mathbf{G}_{jk} = \mathbf{G}_{jk} - \mathbf{U}_{P,ji} * \mathbf{G}_{ik}$
+                \ENDFOR
+            \ENDFOR
+        \ENDFOR
+        \FOR{$i = 1$ \textbf{to} $n$}
+            \STATE $\mathbf{D}_{P,ii} = \mathbf{d}_{i}$
+        \ENDFOR
+    \end{algorithmic}
+\end{algorithm}
+
+The \textit{UDCorrect} subalgorithm is based on Bierman’s U-D factorization method for
+observational updates \cite{bierman1977}. Bierman’s method factorizes the covariance update
+of the $i^{\text{th}}$ step of the sequential update algorithm:
+
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{P}^{(i)} &= \mathbf{P}^{(i-1)} - \mathbf{k}^{(i)} \mathbf{h}^{(i)} \mathbf{P}^{(i-1)} \\
+        &= \mathbf{P}^{(i-1)} - \frac { \mathbf{P}^{(i-1)} {\mathbf{h}^{(i)}}^T \mathbf{h}^{(i)} \mathbf{P}^{(i-1)}} { \mathbf{h}^{(i)} \mathbf{P}^{(i-1)} {\mathbf{h}^{(i)}}^T + r^{(i)} }  \\
+    \end{aligned}
+\end{equation*}
+
+Factoring this into U-D components gives
+
+\begin{equation*}
+    \mathbf{U}^{(i)} \mathbf{D}^{(i)} {\mathbf{U}^{(i)}}^T 
+    = \mathbf{U}^{(i-1)}
+    \left[ \mathbf{D}^{(i-1)}
+    - \frac { \mathbf{D}^{(i-1)} \mathbf{v}^{(i)} {\mathbf{v}^{(i)}}^T \mathbf{D}^{(i-1)}} { {\mathbf{v}^{(i)}}^T  \mathbf{D}^{(i-1)} \mathbf{v}^{(i)} + r^{(i)} } \right]
+    {\mathbf{U}^{(i-1)}}^T
+\end{equation*}
+
+where $\mathbf{v}^{(i)}$ is the $n \times 1$ column vector
+
+\begin{equation*}
+    \mathbf{v}^{(i)} = {\mathbf{U}^{(i-1)}}^T {\mathbf{h}^{(i)}}^T
+\end{equation*}
+
+Bierman’s method factorizes the inner expression into U-D factors
+
+\begin{equation*}
+    \mathbf{D}^{(i-1)}
+    - \frac { \mathbf{D}^{(i-1)} \mathbf{v}^{(i)} {\mathbf{v}^{(i)}}^T \mathbf{D}^{(i-1)}} { {\mathbf{v}^{(i)}}^T  \mathbf{D}^{(i-1)} \mathbf{v}^{(i)} + r^{(i)} }
+    = \mathbf{B}^{(i)} \mathbf{D}^{(i)} {\mathbf{B}^{(i)}}^T
+\end{equation*}
+
+such that
+
+\begin{equation*}
+    \mathbf{U}^{(i)} \mathbf{D}^{(i)} {\mathbf{U}^{(i)}}^T = \mathbf{U}^{(i-1)} \mathbf{B}^{(i)} \mathbf{D}^{(i)} {\mathbf{B}^{(i)}}^T {\mathbf{U}^{(i-1)}}^T
+\end{equation*}
+
+Hence,
+
+\begin{equation*}
+    \mathbf{U}^{(i)} = \mathbf{U}^{(i-1)} \mathbf{B}^{(i)}
+\end{equation*}
+
+The \textit{UDCorrect} subalgorithm of Algorithm \ref{alg:UDCorrect} below implements the
+U-D factorized correction procedure. The inputs to the subalgorithm are
+
+\begin{tabular}{l l}
+\phantom{.} & $\mathbf{x}^{(i-1)}$ \\
+\phantom{.} & $\mathbf{U}_P^{(i-1)}$ \\
+\phantom{.} & $\mathbf{D}_P^{(i-1)}$ \\
+\phantom{.} & $\mathbf{h}^{(i)}$ \\
+\phantom{.} & ${\delta} = {z}^{(i)} - \mathbf{h}^{(i)} \mathbf{x}^{(i-1)}$
+\end{tabular}
+
+and the outputs are:
+
+\begin{tabular}{l l}
+\phantom{.} & $\mathbf{x}^{(i)}$ \\
+\phantom{.} & $\mathbf{U}_P^{(i)}$ \\
+\phantom{.} & $\mathbf{D}_P^{(i)}$
+\end{tabular}
+
+\begin{algorithm}
+    \caption{UDCorrect}
+    \label{alg:UDCorrect}
+    \begin{algorithmic}
+        \STATE Use $\mathbf{k}$ as an $n \times 1$ scratchpad vector
+        \FOR{$j = 1$ \textbf{to} $n$}
+            \STATE $\mathbf{k}_j = \mathbf{h}_j$
+            \FOR{$i = 1$ \textbf{to} $j-1$}
+                \STATE $\mathbf{k}_j = \mathbf{k}_j + \mathbf{U}_{P,ij} * \mathbf{h}_i$
+            \ENDFOR
+        \ENDFOR
+        \STATE $\sigma = r$
+        \FOR{$j = 1$ \textbf{to} $n$}
+            \STATE $v = \mathbf{k}_j$
+            \STATE $\mathbf{k}_j = \mathbf{D}_{P,jj}  * \mathbf{k}_j$
+            \STATE $\omega = \mathbf{k}_j$
+            \FOR{$i = 1$ \textbf{to} $j-1$}
+                \STATE $\tau = \mathbf{U}_{P,ij}  * \omega$
+                \STATE $\mathbf{U}_{P,ij} = \mathbf{U}_{P,ij} - \mathbf{k}_i * v / \sigma$
+                \STATE $\mathbf{k}_i = \mathbf{k}_i + \tau$
+            \ENDFOR
+            \STATE $\mathbf{D}_{P,jj} = \mathbf{D}_{P,jj} * \sigma$
+            \STATE $\sigma = \sigma + \omega * v$
+            \STATE $\mathbf{D}_{P,jj} = \mathbf{D}_{P,jj} / \sigma$
+        \ENDFOR
+        \STATE $\varepsilon = \delta / \sigma$
+        \FOR{$i = 1$ \textbf{to} $n$}
+            \STATE $\mathbf{x}_i = \mathbf{x}_i + \mathbf{k}_i * \varepsilon$
+        \ENDFOR
+    \end{algorithmic}
+\end{algorithm}
+

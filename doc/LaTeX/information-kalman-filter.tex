@@ -1,0 +1,483 @@
+\section{The Information Form of the Kalman Filter}
+\label{The Information Form of the Kalman Filter}
+
+The inverse of a covariance matrix is known as an information matrix. Whereas a
+covariance matrix is an indicator of dispersion, an information matrix is an indicator
+of precision. The smaller the covariance is, the higher the precision is, and vice versa.
+An information matrix of $\mathbf{0}$ value implies infinite covariance, meaning that no
+statistical information can be inferred. The Kalman filter can be reformulated to use the
+inverse of $\mathbf{P}$, although this form of the Kalman filter is rarely used for
+implementation. However, it does have useful theoretical purposes.
+
+Recall the Kalman filter \textit{a posteriori} covariance expression given in
+(\ref{eq:a-posteriori-state-covariance-quadratic})
+
+\begin{equation*}
+    \mathbf{P}_k = \mathbf{P}_{k|k-1} - \mathbf{K}_{k} \, \mathbf{S}_{k} \, \mathbf{K}_{k}^T
+\end{equation*}
+
+Remembering that $\mathbf{P}$ and $\mathbf{S}$ are symmetric, inserting the expression
+for $\mathbf{K}_k$ gives
+
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{P}_k
+        &= \mathbf{P}_{k|k-1} - \left( \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{S}_k^{-1} \right) \mathbf{S}_{k} \left( \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{S}_k^{-1} \right)^T \\
+        &= \mathbf{P}_{k|k-1} - \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{S}_k^{-1} \mathbf{S}_{k} \mathbf{S}_k^{-1} \mathbf{H}_k \mathbf{P}_{k|k-1} \\
+        &= \mathbf{P}_{k|k-1} - \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{S}_k^{-1} \mathbf{H}_k \mathbf{P}_{k|k-1}
+    \end{aligned}
+\end{equation*}
+
+and then inserting the expression for $\mathbf{S}_k$ gives
+
+\begin{equation}
+    \mathbf{P}_k = \mathbf{P}_{k|k-1} - \mathbf{P}_{k|k-1} \mathbf{H}_k^T \left[ \mathbf{H}_k \mathbf{P}_{k|k-1} \mathbf{H}_k^T + \mathbf{R}_k \right]^{-1} \mathbf{H}_k \mathbf{P}_{k|k-1}
+    \label{eq:state-covariance-quadratic-expanded}
+\end{equation}
+
+Our objective is to transform (\ref{eq:state-covariance-quadratic-expanded}) into a form
+based on $\mathbf{P}_k^{-1}$ and $\mathbf{P}_{k|k-1}^{-1}$. Observe that this equation is of the form
+
+\begin{equation}
+    \mathbf{P}_k = \mathbf{A} - \mathbf{B}^T \mathbf{C} \mathbf{B}
+    \label{eq:state-covariance-quadratic-form}
+\end{equation}
+
+where
+
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{A} &= \mathbf{P}_{k|k-1} \\
+        \mathbf{B} &= \mathbf{H}_k \mathbf{P}_{k|k-1} \\
+        \mathbf{B}^T & = \mathbf{P}_{k|k-1} \mathbf{H}_k^T \\
+        \mathbf{C} &= \left[ \mathbf{H}_k \mathbf{P}_{k|k-1} \mathbf{H}_k^T + \mathbf{R}_k \right]^{-1}
+    \end{aligned}
+\end{equation*}
+
+We now need to introduce some useful matrix lemmas \cite{brookes2020}.
+
+\boxed{
+\parbox{\textwidth}{
+\begin{lemma}
+\label{AB-matrix-expansion-identity}
+Let $\mathbf{A}$ and $\mathbf{B}$ both be square matrices of equal dimensions.
+Then.
+\begin{equation*}
+    \mathbf{A} \left( \mathbf{I} + \mathbf{B} \mathbf{A} \right) = \left( \mathbf{I} + \mathbf{A} \mathbf{B} \right) \mathbf{A}
+\end{equation*}
+\end{lemma}
+}
+}
+
+\begin{proof}
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{A} \left( \mathbf{I} + \mathbf{B} \mathbf{A} \right) &= \mathbf{A} + \mathbf{A} \mathbf{B} \mathbf{A} \\
+        &= \left( \mathbf{I} + \mathbf{A} \mathbf{B} \right) \mathbf{A}
+    \end{aligned}
+\end{equation*}
+\end{proof}
+
+\boxed{
+\parbox{\textwidth}{
+\begin{lemma}
+\label{AB-matrix-inverse-expansion-identity}
+Let $\mathbf{A}$ and $\mathbf{B}$ both be square and invertible matrices of equal dimensions.
+Then.
+\begin{equation*}
+    \mathbf{A} \left( \mathbf{I} + \mathbf{B} \mathbf{A} \right)^{-1} = \left( \mathbf{I} + \mathbf{A} \mathbf{B} \right)^{-1} \mathbf{A}
+\end{equation*}
+\end{lemma}
+}
+}
+
+\begin{proof}
+From Lemma \ref{AB-matrix-expansion-identity}, we see that
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{A} \left( \mathbf{I} + \mathbf{B} \mathbf{A} \right)
+        &= \left( \mathbf{I} + \mathbf{A} \mathbf{B} \right) \mathbf{A} \\
+        \left[ \mathbf{A} \left( \mathbf{I} + \mathbf{B} \mathbf{A} \right) \right]^{-1}
+        &= \left[ \left( \mathbf{I} + \mathbf{A} \mathbf{B} \right) \mathbf{A} \right]^{-1} \\
+        \left( \mathbf{I} + \mathbf{B} \mathbf{A} \right)^{-1} \mathbf{A}^{-1}
+        &= \mathbf{A}^{-1} \left( \mathbf{I} + \mathbf{A} \mathbf{B} \right)^{-1} \\
+        \mathbf{A} \left( \mathbf{I} + \mathbf{B} \mathbf{A} \right)^{-1} \mathbf{A}^{-1}
+        &= \left( \mathbf{I} + \mathbf{A} \mathbf{B} \right)^{-1} \\
+        \mathbf{A} \left( \mathbf{I} + \mathbf{B} \mathbf{A} \right)^{-1}
+        &= \left( \mathbf{I} + \mathbf{A} \mathbf{B} \right)^{-1} \mathbf{A}
+    \end{aligned}
+\end{equation*}
+\end{proof}
+
+\boxed{
+\parbox{\textwidth}{
+\begin{lemma}
+\label{A-matrix-inverse-expansion-identity}
+Let $\mathbf{A}$ be a square and invertible matrix.
+Then.
+\begin{equation*}
+    \left( \mathbf{I} + \mathbf{A} \right)^{-1} = \mathbf{I} - \left( \mathbf{I} + \mathbf{A} \right)^{-1} \mathbf{A}
+\end{equation*}
+\end{lemma}
+}
+}
+
+\begin{proof}
+Noting that multiplying by $\mathbf{I} + \mathbf{A} - \mathbf{A}$ does not alter the value
+of $\left( \mathbf{I} + \mathbf{A} \right)^{-1}$, we see that
+\begin{equation*}
+    \begin{aligned}
+        \left( \mathbf{I} + \mathbf{A} \right)^{-1}
+        &= \left( \mathbf{I} + \mathbf{A} \right)^{-1} \left( \mathbf{I} + \mathbf{A} - \mathbf{A} \right) \\
+        &= \left( \mathbf{I} + \mathbf{A} \right)^{-1} \left( \mathbf{I} + \mathbf{A} \right)
+        - \left( \mathbf{I} + \mathbf{A} \right)^{-1} \left( \mathbf{A} \right) \\
+        &= \mathbf{I} - \left( \mathbf{I} + \mathbf{A} \right)^{-1} \mathbf{A}
+    \end{aligned}
+\end{equation*}
+\end{proof}
+
+\boxed{
+\parbox{\textwidth}{
+\begin{lemma}
+\label{ABCD-matrix-inverse-expansion-identity}
+Let $\mathbf{A}$ be a square and invertible matrix, and let $\mathbf{B}$, $\mathbf{C}$,
+and $\mathbf{D}$ be matrices such that the expression $\mathbf{A} + \mathbf{B} \mathbf{C} \mathbf{D}$
+is invertible.
+Then.
+\begin{equation*}
+    \left( \mathbf{A} + \mathbf{B} \mathbf{C} \mathbf{D} \right)^{-1} =
+    \mathbf{A}^{-1} - \left( \mathbf{I} + \mathbf{A}^{-1}\mathbf{B} \mathbf{C} \mathbf{D} \right)^{-1} \mathbf{A}^{-1} \mathbf{B} \mathbf{C} \mathbf{D} \mathbf{A}^{-1}
+\end{equation*}
+\end{lemma}
+}
+}
+
+\begin{proof}
+Using Lemma \ref{A-matrix-inverse-expansion-identity}, we have that
+\begin{equation*}
+    \begin{aligned}
+        \left( \mathbf{A} + \mathbf{B} \mathbf{C} \mathbf{D} \right)^{-1}
+        &= \left( \mathbf{A} + \mathbf{A} \mathbf{A}^{-1}\mathbf{B} \mathbf{C} \mathbf{D} \right)^{-1} \\
+        &= \left( \mathbf{A} \left[ \mathbf{I} + \mathbf{A}^{-1} \mathbf{B} \mathbf{C} \mathbf{D} \right] \right)^{-1} \\
+        &= \left[ \mathbf{I} + \mathbf{A}^{-1} \mathbf{B} \mathbf{C} \mathbf{D} \right]^{-1} \mathbf{A}^{-1} \\
+        &= \left[ \mathbf{I} - \left( \mathbf{I} + \mathbf{A}^{-1}\mathbf{B} \mathbf{C} \mathbf{D} \right)^{-1} \mathbf{A}^{-1} \mathbf{B} \mathbf{C} \mathbf{D} \right] \mathbf{A}^{-1} \\
+        &= \mathbf{A}^{-1} - \left( \mathbf{I} + \mathbf{A}^{-1}\mathbf{B} \mathbf{C} \mathbf{D} \right)^{-1} \mathbf{A}^{-1} \mathbf{B} \mathbf{C} \mathbf{D} \mathbf{A}^{-1}
+    \end{aligned}
+\end{equation*}
+\end{proof}
+
+\boxed{
+\parbox{\textwidth}{
+\begin{lemma}
+\label{ABCD-matrix-inverse-expansion-identity-three}
+Let $\mathbf{A}$ be a square and invertible matrix, and let $\mathbf{B}$, $\mathbf{C}$,
+and $\mathbf{D}$ be matrices such that the expression $\mathbf{A} + \mathbf{B} \mathbf{C} \mathbf{D}$
+is invertible.
+Then.
+\begin{equation*}
+    \left( \mathbf{A} + \mathbf{B} \mathbf{C} \mathbf{D} \right)^{-1} =
+    \mathbf{A}^{-1} - \mathbf{A}^{-1} \mathbf{B} \left( \mathbf{I} + \mathbf{C} \mathbf{D} \mathbf{A}^{-1} \mathbf{B} \right)^{-1} \mathbf{C} \mathbf{D} \mathbf{A}^{-1}
+\end{equation*}
+\end{lemma}
+}
+}
+
+\begin{proof}
+By repeatedly applying Lemmas \ref{AB-matrix-inverse-expansion-identity}
+and \ref{A-matrix-inverse-expansion-identity}
+to Lemma \ref{ABCD-matrix-inverse-expansion-identity}, we have the following equivalence relations
+\begin{equation*}
+    \begin{aligned}
+        \left( \mathbf{A} + \mathbf{B} \mathbf{C} \mathbf{D} \right)^{-1}
+        &= \mathbf{A}^{-1} - \left( \mathbf{I} + \mathbf{A}^{-1}\mathbf{B} \mathbf{C} \mathbf{D} \right)^{-1} \mathbf{A}^{-1} \mathbf{B} \mathbf{C} \mathbf{D} \mathbf{A}^{-1}
+        & (1) \\
+        &= \mathbf{A}^{-1} - \mathbf{A}^{-1} \left( \mathbf{I} + \mathbf{B} \mathbf{C} \mathbf{D} \mathbf{A}^{-1} \right)^{-1} \mathbf{B} \mathbf{C} \mathbf{D} \mathbf{A}^{-1}
+        & (2) \\
+        &= \mathbf{A}^{-1} - \mathbf{A}^{-1} \mathbf{B} \left( \mathbf{I} + \mathbf{C} \mathbf{D} \mathbf{A}^{-1} \mathbf{B} \right)^{-1} \mathbf{C} \mathbf{D} \mathbf{A}^{-1}
+        & (3) \\
+        &= \mathbf{A}^{-1} - \mathbf{A}^{-1} \mathbf{B} \mathbf{C} \left( \mathbf{I} + \mathbf{D} \mathbf{A}^{-1} \mathbf{B} \mathbf{C} \right)^{-1} \mathbf{D} \mathbf{A}^{-1}
+        & (4) \\
+        &= \mathbf{A}^{-1} - \mathbf{A}^{-1} \mathbf{B} \mathbf{C} \mathbf{D} \left( \mathbf{I} + \mathbf{A}^{-1} \mathbf{B} \mathbf{C} \mathbf{D} \right)^{-1} \mathbf{A}^{-1}
+        & (5) \\
+        &= \mathbf{A}^{-1} - \mathbf{A}^{-1} \mathbf{B} \mathbf{C} \mathbf{D} \mathbf{A}^{-1} \left( \mathbf{I} + \mathbf{B} \mathbf{C} \mathbf{D} \mathbf{A}^{-1} \right)^{-1}
+        & (6)
+    \end{aligned}
+\end{equation*}
+The third equivalence relation establishes the lemma.
+\end{proof}
+
+\boxed{
+\parbox{\textwidth}{
+\begin{lemma}
+\label{the-matrix-inversion-lemma}
+Let $\mathbf{A}$ and $\mathbf{C}$ both be square and invertible matrices, and let $\mathbf{B}$, $\mathbf{C}$,
+and $\mathbf{D}$ be matrices such that the expression $\mathbf{A} + \mathbf{B} \mathbf{C} \mathbf{D}$
+is invertible.
+Then.
+\begin{equation*}
+    \left( \mathbf{A} + \mathbf{B} \mathbf{C} \mathbf{D} \right)^{-1}
+    = \mathbf{A}^{-1} - \mathbf{A}^{-1} \mathbf{B} \left( \mathbf{C}^{-1} + \mathbf{D} \mathbf{A}^{-1} \mathbf{B} \right)^{-1} \mathbf{D} \mathbf{A}^{-1}
+\end{equation*}
+\end{lemma}
+}
+}
+
+\begin{proof}
+Because $\mathbf{C}^{-1}$ exists, then Lemma \ref{ABCD-matrix-inverse-expansion-identity-three} becomes
+\begin{equation*}
+    \begin{aligned}
+        \left( \mathbf{A} + \mathbf{B} \mathbf{C} \mathbf{D} \right)^{-1}
+        &= \mathbf{A}^{-1} - \mathbf{A}^{-1} \mathbf{B} \left( \mathbf{I} + \mathbf{C} \mathbf{D} \mathbf{A}^{-1} \mathbf{B} \right)^{-1} \mathbf{C} \mathbf{D} \mathbf{A}^{-1} \\
+        &= \mathbf{A}^{-1} - \mathbf{A}^{-1} \mathbf{B} \left( \mathbf{C} \mathbf{C}^{-1} + \mathbf{C} \mathbf{D} \mathbf{A}^{-1} \mathbf{B} \right)^{-1} \mathbf{C} \mathbf{D} \mathbf{A}^{-1} \\
+        &= \mathbf{A}^{-1} - \mathbf{A}^{-1} \mathbf{B} \left( \mathbf{C} \left[ \mathbf{C}^{-1} + \mathbf{D} \mathbf{A}^{-1} \mathbf{B} \right] \right)^{-1} \mathbf{C} \mathbf{D} \mathbf{A}^{-1} \\
+        &= \mathbf{A}^{-1} - \mathbf{A}^{-1} \mathbf{B} \left( \mathbf{C}^{-1} + \mathbf{D} \mathbf{A}^{-1} \mathbf{B} \right)^{-1} \mathbf{C}^{-1} \mathbf{C} \mathbf{D} \mathbf{A}^{-1} \\
+        &= \mathbf{A}^{-1} - \mathbf{A}^{-1} \mathbf{B} \left( \mathbf{C}^{-1} + \mathbf{D} \mathbf{A}^{-1} \mathbf{B} \right)^{-1} \mathbf{D} \mathbf{A}^{-1}
+    \end{aligned}
+\end{equation*}
+\end{proof}
+
+It is worth mentioning that Lemma \ref{the-matrix-inversion-lemma} is a commonly
+referenced matrix identity in many applications, for example, linear quadratic regulator
+control theory. Is is commonly titled \textit{"The Matrix Inversion Lemma"} the technical literature.
+
+\boxed{
+\parbox{\textwidth}{
+\begin{lemma}
+\label{matrix-inversion-lemma-negative}
+Let $\mathbf{A}$ and $\mathbf{C}$ both be square and invertible matrices, and let $\mathbf{B}$, $\mathbf{C}$,
+and $\mathbf{D}$ be matrices such that the expression $\mathbf{A} - \mathbf{B} \mathbf{C} \mathbf{D}$
+is invertible.
+Then.
+\begin{equation*}
+    \left( \mathbf{A} - \mathbf{B} \mathbf{C} \mathbf{D} \right)^{-1}
+    = \mathbf{A}^{-1} + \mathbf{A}^{-1} \mathbf{B} \left( \mathbf{C}^{-1} - \mathbf{D} \mathbf{A}^{-1} \mathbf{B} \right)^{-1} \mathbf{D} \mathbf{A}^{-1}
+\end{equation*}
+\end{lemma}
+}
+}
+
+\begin{proof}
+Let $\mathbf{F}$ be a matrix compatible with Lemma \ref{the-matrix-inversion-lemma} so that
+\begin{equation*}
+    \left( \mathbf{A} + \mathbf{F} \mathbf{C} \mathbf{D} \right)^{-1}
+    = \mathbf{A}^{-1} - \mathbf{A}^{-1} \mathbf{F} \left( \mathbf{C}^{-1} + \mathbf{D} \mathbf{A}^{-1} \mathbf{F} \right)^{-1} \mathbf{D} \mathbf{A}^{-1}
+\end{equation*}
+Letting $\mathbf{F} = - \mathbf{B}$ we see that
+\begin{equation*}
+    \left( \mathbf{A} - \mathbf{B} \mathbf{C} \mathbf{D} \right)^{-1}
+    = \mathbf{A}^{-1} + \mathbf{A}^{-1} \mathbf{B} \left( \mathbf{C}^{-1} - \mathbf{D} \mathbf{A}^{-1} \mathbf{B} \right)^{-1} \mathbf{D} \mathbf{A}^{-1}
+\end{equation*}
+\end{proof}
+
+\boxed{
+\parbox{\textwidth}{
+\begin{lemma}
+\label{matrix-inversion-lemma-A-BtCB}
+Let $\mathbf{A}$ and $\mathbf{C}$ both be square and invertible matrices, and let $\mathbf{B}$ and $\mathbf{C}$
+be matrices such that the expression $\mathbf{A} - \mathbf{B}^T \mathbf{C} \mathbf{B}$
+is invertible.
+Then.
+\begin{equation*}
+    \left( \mathbf{A} - \mathbf{B}^T \mathbf{C} \mathbf{B} \right)^{-1}
+    = \mathbf{A}^{-1} + \mathbf{A}^{-1} \mathbf{B}^T \left( \mathbf{C}^{-1} - \mathbf{B} \mathbf{A}^{-1} \mathbf{B}^T \right)^{-1} \mathbf{B} \mathbf{A}^{-1}
+\end{equation*}
+\end{lemma}
+}
+}
+
+\begin{proof}
+Let $\mathbf{F}$ and $\mathbf{G}$ be matrices compatible with Lemma \ref{matrix-inversion-lemma-negative} so that
+\begin{equation*}
+    \left( \mathbf{A} - \mathbf{F} \mathbf{C} \mathbf{G} \right)^{-1}
+    = \mathbf{A}^{-1} + \mathbf{A}^{-1} \mathbf{F} \left( \mathbf{C}^{-1} - \mathbf{G} \mathbf{A}^{-1} \mathbf{F} \right)^{-1} \mathbf{G} \mathbf{A}^{-1}
+\end{equation*}
+Letting $\mathbf{F} = \mathbf{B}^T$ and $\mathbf{G} = \mathbf{B}$ we see that
+\begin{equation*}
+    \left( \mathbf{A} - \mathbf{B}^T \mathbf{C} \mathbf{B} \right)^{-1}
+    = \mathbf{A}^{-1} + \mathbf{A}^{-1} \mathbf{B}^T \left( \mathbf{C}^{-1} - \mathbf{B} \mathbf{A}^{-1} \mathbf{B}^T \right)^{-1} \mathbf{B} \mathbf{A}^{-1}
+\end{equation*}
+\end{proof}
+
+Observe that we now have a Lemma expression where the term on the LHS,
+$\mathbf{A} - \mathbf{B}^T \mathbf{C} \mathbf{B}$,
+is exactly the same form as the RHS of (\ref{eq:state-covariance-quadratic-form})
+
+\begin{equation*}
+    \mathbf{P}_k = \mathbf{A} - \mathbf{B}^T \mathbf{C} \mathbf{B}
+\end{equation*}
+
+Recall that this is a structural representation of the expanded \textit{a posteriori}
+covariance expression (\ref{eq:state-covariance-quadratic-expanded})
+
+\begin{equation*}
+    \mathbf{P}_k = \mathbf{P}_{k|k-1} - \mathbf{P}_{k|k-1} \mathbf{H}_k^T \left[ \mathbf{H}_k \mathbf{P}_{k|k-1} \mathbf{H}_k^T + \mathbf{R}_k \right]^{-1} \mathbf{H}_k \mathbf{P}_{k|k-1}
+\end{equation*}
+
+with
+
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{A} &= \mathbf{P}_{k|k-1} \\
+        \mathbf{B} &= \mathbf{H}_k \mathbf{P}_{k|k-1} \\
+        \mathbf{C} &= \left[ \mathbf{H}_k \mathbf{P}_{k|k-1} \mathbf{H}_k^T + \mathbf{R}_k \right]^{-1}
+    \end{aligned}
+\end{equation*}
+
+so that
+
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{B}^T & = \mathbf{P}_{k|k-1} \mathbf{H}_k^T \\
+        \mathbf{C}^{-1} &= \left[ \mathbf{H}_k \mathbf{P}_{k|k-1} \mathbf{H}_k^T + \mathbf{R}_k \right]
+    \end{aligned}
+\end{equation*}
+
+Then, by applying Lemma \ref{matrix-inversion-lemma-A-BtCB}, we have
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{P}_k^{-1}
+        &= \left( \mathbf{A} - \mathbf{B}^T \mathbf{C} \mathbf{B} \right)^{-1} \\
+        &= \mathbf{A}^{-1} + \mathbf{A}^{-1} \mathbf{B}^T \left( \mathbf{C}^{-1} - \mathbf{B} \mathbf{A}^{-1} \mathbf{B}^T \right)^{-1} \mathbf{B} \mathbf{A}^{-1} \\
+        &= \mathbf{P}_{k|k-1}^{-1} + \mathbf{P}_{k|k-1}^{-1} \mathbf{P}_{k|k-1} \mathbf{H}_k^T
+        \left( \left[ \mathbf{H}_k \mathbf{P}_{k|k-1} \mathbf{H}_k^T + \mathbf{R}_k \right] \right. \\
+        & \phantom{M} \left. - \mathbf{H}_k \mathbf{P}_{k|k-1} \mathbf{P}_{k|k-1}^{-1} \mathbf{P}_{k|k-1} \mathbf{H}_k^T \right)^{-1}
+        \mathbf{H}_k \mathbf{P}_{k|k-1} \mathbf{P}_{k|k-1}^{-1} \\
+        &= \mathbf{P}_{k|k-1}^{-1} + \mathbf{H}_k^T
+        \left( \mathbf{H}_k \mathbf{P}_{k|k-1} \mathbf{H}_k^T + \mathbf{R}_k - \mathbf{H}_k \mathbf{P}_{k|k-1} \mathbf{H}_k^T \right)^{-1}
+        \mathbf{H}_k \\
+        &= \mathbf{P}_{k|k-1}^{-1} + \mathbf{H}_k^T \mathbf{R}_k^{-1} \mathbf{H}_k
+    \end{aligned}
+\end{equation*}
+
+and so the \textit{a posteriori} correction update of the Kalman filter information matrix,
+$\mathbf{P}_k^{-1}$, is
+
+\boxed{
+\parbox{\textwidth}{
+\begin{equation}
+    \mathbf{P}_k^{-1} = \mathbf{P}_{k|k-1}^{-1} + \mathbf{H}_k^T \mathbf{R}_k^{-1} \mathbf{H}_k
+    \label{eq:state-correction-information-matrix}
+\end{equation}
+}
+}
+
+Next, recall the expression of the Kalman filter gain with $\mathbf{S}_k$ expanded
+
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{K}_k &= \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{S}_k^{-1} \\
+        &= \mathbf{P}_{k|k-1} \mathbf{H}_k^T \left[ \mathbf{H}_k \mathbf{P}_{k|k-1} \mathbf{H}_k^T + \mathbf{R}_k \right]^{-1}
+    \end{aligned}
+\end{equation*}
+
+Strategically inserting $\mathbf{R}_k^{-1} \mathbf{R}_k$ does not alter the gain, and so
+
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{K}_k
+        &= \mathbf{P}_{k|k-1} \mathbf{H}_k^T \left[ \mathbf{H}_k \mathbf{P}_{k|k-1} \mathbf{H}_k^T + \mathbf{R}_k \right]^{-1} \\
+        &= \mathbf{P}_{k|k-1} \mathbf{H}_k^T \left( \mathbf{R}_k^{-1} \mathbf{R}_k \right) \left[ \mathbf{H}_k \mathbf{P}_{k|k-1} \mathbf{H}_k^T + \mathbf{R}_k \right]^{-1} \\
+        &= \mathbf{P}_{k|k-1} \mathbf{H}_k^T \left( \mathbf{R}_k^{-1} \right) \left[ \left( \mathbf{H}_k \mathbf{P}_{k|k-1} \mathbf{H}_k^T + \mathbf{R}_k \right) \mathbf{R}_k^{-1} \right]^{-1} \\
+        &= \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{R}_k^{-1} \left[ \mathbf{H}_k \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{R}_k^{-1} + \mathbf{I} \right]^{-1}
+    \end{aligned}
+\end{equation*}
+
+Likewise, strategically inserting $\mathbf{P}_k \mathbf{P}_k^{-1}$ does not alter the gain, and so
+
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{K}_k
+        &= \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{R}_k^{-1} \left[ \mathbf{H}_k \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{R}_k^{-1} + \mathbf{I} \right]^{-1} \\
+        &= \left( \mathbf{P}_k \mathbf{P}_k^{-1} \right)
+        \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{R}_k^{-1} \left[ \mathbf{H}_k \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{R}_k^{-1} + \mathbf{I} \right]^{-1} \\
+        &= \mathbf{P}_k \left( \mathbf{P}_k^{-1} \right)
+        \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{R}_k^{-1} \left[ \mathbf{H}_k \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{R}_k^{-1} + \mathbf{I} \right]^{-1} \\
+        &= \mathbf{P}_k \left[ \mathbf{P}_{k|k-1}^{-1} + \mathbf{H}_k^T \mathbf{R}_k^{-1} \mathbf{H}_k \right]
+        \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{R}_k^{-1} \left[ \mathbf{H}_k \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{R}_k^{-1} + \mathbf{I} \right]^{-1} \\
+        &= \mathbf{P}_k \left[ \mathbf{I} + \mathbf{H}_k^T \mathbf{R}_k^{-1} \mathbf{H}_k \mathbf{P}_{k|k-1} \right]
+        \mathbf{H}_k^T \mathbf{R}_k^{-1} \left[ \mathbf{H}_k \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{R}_k^{-1} + \mathbf{I} \right]^{-1}
+    \end{aligned}
+\end{equation*}
+
+Using Lemma \ref{AB-matrix-expansion-identity}, we see that the
+$\left[ \mathbf{I} + \mathbf{H}_k^T \mathbf{R}_k^{-1} \mathbf{H}_k \mathbf{P}_{k|k-1} \right] \mathbf{H}_k^T \mathbf{R}_k^{-1}$
+term becomes
+
+\begin{equation*}
+    \left[ \mathbf{I} + \mathbf{H}_k^T \mathbf{R}_k^{-1} \mathbf{H}_k \mathbf{P}_{k|k-1} \right] \mathbf{H}_k^T \mathbf{R}_k^{-1}
+    = \mathbf{H}_k^T \mathbf{R}_k^{-1} \left[ \mathbf{I} + \mathbf{H}_k \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{R}_k^{-1} \right]
+\end{equation*}
+
+and so
+
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{K}_k
+        &= \mathbf{P}_k \left( \left[ \mathbf{I} + \mathbf{H}_k^T \mathbf{R}_k^{-1} \mathbf{H}_k \mathbf{P}_{k|k-1} \right]
+        \mathbf{H}_k^T \mathbf{R}_k^{-1} \right) \left[ \mathbf{H}_k \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{R}_k^{-1} + \mathbf{I} \right]^{-1} \\
+        &= \mathbf{P}_k \left( \mathbf{H}_k^T \mathbf{R}_k^{-1} \left[ \mathbf{I} + \mathbf{H}_k \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{R}_k^{-1} \right] \right)
+        \left[ \mathbf{H}_k \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{R}_k^{-1} + \mathbf{I} \right]^{-1} \\
+        &= \mathbf{P}_k \mathbf{H}_k^T \mathbf{R}_k^{-1} \left[ \mathbf{H}_k \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{R}_k^{-1} + \mathbf{I} \right]
+        \left[ \mathbf{H}_k \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{R}_k^{-1} + \mathbf{I} \right]^{-1} \\
+        &= \mathbf{P}_k \mathbf{H}_k^T \mathbf{R}_k^{-1}
+    \end{aligned}
+\end{equation*}
+
+and so the Kalman gain can be expressed as
+
+\boxed{
+\parbox{\textwidth}{
+\begin{equation}
+    \mathbf{K}_k = \mathbf{P}_k \mathbf{H}_k^T \mathbf{R}_k^{-1}
+    \label{eq:kalman-gain-from-information-matrix}
+\end{equation}
+}
+}
+
+It is important to recognize that this form of the Kalman gain relies on the
+\textit{a posteriori} covariance, $\mathbf{P}_k$. In contrast, the regular form of the
+Kalman gain (\ref{eq:kalman-gain})
+
+\begin{equation*}
+    \mathbf{K}_k = \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{S}_k^{-1}
+\end{equation*}
+
+relies on the \textit{a priori} covariance, $\mathbf{P}_{k|k-1}$.
+Hence, the use of the \textit{a posteriori} form of the Kalman gain requires that the
+\textit{a posteriori} state update must be done after the \textit{a posteriori} state
+covariance update and the associated gain evaluation.
+
+The information form of the Kalman filter update cycle for a forced input system is
+
+I. Projection (\textit{a priori}) update:
+
+\begin{equation*}
+    \begin{aligned}
+        \hat{\mathbf{x}}_{k|k-1} &= \mathbf{\Phi}_{k|k-1} \hat{\mathbf{x}}_{k-1} + \mathbf{u}_{k-1} \\
+        \mathbf{P}_{k|k-1} &= \mathbf{\Phi}_{k|k-1} \, \mathbf{P}_{k-1} \, \mathbf{\Phi}_{k|k-1}^T + \mathbf{\Gamma}_{k|k-1} \mathbf{Q}_{k-1} \mathbf{\Gamma}_{k|k-1}^T
+    \end{aligned}
+\end{equation*}
+
+II. Correction (\textit{a posteriori}) update:
+
+\begin{equation*}
+    \begin{aligned}
+        \hat{\mathbf{z}}_k &= \mathbf{H}_k \hat{\mathbf{x}}_{k|k-1} \\
+        \tilde{\mathbf{z}}_k &= \mathbf{z}_k - \hat{\mathbf{z}}_k \\
+        \mathbf{P}_k^{-1} &= \mathbf{P}_{k|k-1}^{-1} + \mathbf{H}_k^T \mathbf{R}_k^{-1} \mathbf{H}_k \\
+        \mathbf{K}_{k} &= \mathbf{P}_k \mathbf{H}_k^T \mathbf{R}_k^{-1} \\
+        \hat{\mathbf{x}}_k &= \hat{\mathbf{x}}_{k|k-1} +\mathbf{K}_k \, \tilde{\mathbf{z}}_k
+    \end{aligned}
+\end{equation*}
+
+Note that this requires performing an inversion of $\mathbf{P}_{k|k-1}$ and another
+inversion of $\mathbf{P}_k^{-1}$. Also, instead of needing to form and compute
+$\mathbf{S}_k^{-1}$, we compute $\mathbf{R}_k^{-1}$. While the size of $\mathbf{R}_k$
+and $\mathbf{S}_k$ are both $m \times m$, typically $\mathbf{R}_k$ is static across
+successive measurement updates and so $\mathbf{R}_k^{-1}$ needs to computed only once.
+In addition, if $\mathbf{R}_k$ is diagonal, evaluation of $\mathbf{R}_k^{-1}$ is trivial.
+
+In general, this form of the Kalman filter is not implemented unless the equations can
+be coded such that they are computationally feasible and can numerically preserve the
+structure of $\mathbf{P}_k$.
+

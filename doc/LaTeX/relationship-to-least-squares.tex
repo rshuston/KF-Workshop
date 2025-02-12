@@ -1,0 +1,61 @@
+\section{Relationship to Least-Squares Estimation}
+\label{Relationship to Least-Squares Estimation}
+
+As stated previously, the Kalman filter is not a specialized least-squares estimator;
+it is its own formulation. However, there is an interesting relationship between the
+Kalman filter and the least-squares estimator.
+
+Recall that the least-squares estimation problem relies only on the observation relation
+and does not involve the progression of time. The system description is static, and so
+the unforced system process model is
+
+\begin{equation*}
+    \mathbf{x}_{k+1} = \mathbf{I} \, \mathbf{x}_k + \mathbf{0}
+\end{equation*}
+
+Since the progression of time is not applicable, we assume that all observations occur
+simultaneously at $k = 1$, and so the observation equation is an overdetermined relationship
+of the form
+
+\begin{equation*}
+    \mathbf{z}_1 = \mathbf{H}_1 \mathbf{x}_1 + \mathbf{v}_1
+\end{equation*}
+
+where $E \left\{ \mathbf{v}_1 \mathbf{v}_1^T \right\} = \mathbf{R}_1$. In addition,
+we have no \textit{a priori} knowledge of $\mathbf{x}$ and so $\hat{\mathbf{x}}_0 = \mathbf{0}$,
+and the associated covariance is $\mathbf{P}_0 = \mathbf{\infty}$.
+
+Therefore, using the information form of the Kalman filter, the state error covariance becomes
+
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{P}_1^{-1} &= \mathbf{P}_0^{-1} + \mathbf{H}_1^T \mathbf{R}_1^{-1} \mathbf{H}_1 \\
+        &= \left( \mathbf{\infty} \right)^{-1} + \mathbf{H}_1^T \mathbf{R}_1^{-1} \mathbf{H}_1 \\
+        &= \mathbf{0} + \mathbf{H}_1^T \mathbf{R}_1^{-1} \mathbf{H}_1 \\
+        &= \mathbf{H}_1^T \mathbf{R}_1^{-1} \mathbf{H}_1
+    \end{aligned}
+\end{equation*}
+
+and the Kalman gain becomes
+
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{K}_1 &= \mathbf{P}_1 \mathbf{H}_1^T \mathbf{R}_1^{-1} \\
+        &= \left( \mathbf{H}_1^T \mathbf{R}_1^{-1} \mathbf{H}_1 \right)^{-1} \mathbf{H}_1^T \mathbf{R}_1^{-1}
+    \end{aligned}
+\end{equation*}
+
+Then, the Kalman \textit{a posteriori} update of the state estimate becomes a least-squares
+solution with the optimal weight $\mathbf{W} = \mathbf{R}_1^{-1}$:
+
+\begin{equation*}
+    \begin{aligned}
+        \hat{\mathbf{x}}_1 &= \hat{\mathbf{x}}_0 + \mathbf{K}_1 \left[ \mathbf{z}_1 - \hat{\mathbf{x}}_0 \right] \\
+        &= \mathbf{0} + \mathbf{K}_1 \left[ \mathbf{z}_1 - \mathbf{0} \right] \\
+        &= \mathbf{K}_1 \mathbf{z}_1 \\
+        &= \left( \mathbf{H}_1^T \mathbf{R}_1^{-1} \mathbf{H}_1 \right)^{-1} \mathbf{H}_1^T \mathbf{R}_1^{-1} \mathbf{z}_1
+    \end{aligned}
+\end{equation*}
+
+Hence, when applied to a static system description, the Kalman filter reduces to a
+least-squares solution. So I’ve got that going for me, which is nice.

@@ -1,0 +1,90 @@
+\section{The Extended Kalman Filter}
+\label{The Extended Kalman Filter}
+
+The Kalman filter can be extended to handle nonlinear systems. Consider the nonlinear system dynamical process model
+
+\begin{equation*}
+    \mathbf{x}_{k+1} = \mathbf{f} \left( \mathbf{x}_k \right) + \mathbf{\Gamma}_{k+1|k} \mathbf{w}_k
+\end{equation*}
+
+where $\mathbf{x}$ is an $n \times 1$ state vector, $\mathbf{f}()$ is an $n \times 1$
+matrix function, $\mathbf{\Gamma}$ is an $n \times p$ transformation matrix, and $\mathbf{w}_k$
+is a $p \times 1$ white noise sequence with covariance
+
+\begin{equation*}
+    E \left\{ \mathbf{w}_k \mathbf{w}_k^T \right\} = \mathbf{Q}_k
+\end{equation*}
+
+and the nonlinear observation model
+
+\begin{equation*}
+    \mathbf{z}_k = \mathbf{h} \left( \mathbf{x}_k \right) + \mathbf{v}_k
+\end{equation*}
+
+where $\mathbf{z}$ is an $m \times 1$ vector, $\mathbf{h}()$ is an $m \times 1$ matrix
+function, and $\mathbf{v}_k$ is an $m \times 1$ white noise sequence with covariance
+
+\begin{equation*}
+    E \left\{ \mathbf{v}_k \mathbf{v}_k^T \right\} = \mathbf{R}_k
+\end{equation*}
+
+The process and observation noise sequences are uncorrelated
+
+\begin{equation*}
+    E \left\{ \mathbf{w}_j \mathbf{v}_k^T \right\} = \mathbf{0} \, , \phantom{.} \mathrm{for} \, \mathrm{all} \, j \, \mathrm{and} \, k
+\end{equation*}
+
+Given a previously determined state estimate, $\hat{\mathbf{x}}_{k-1}$, the \textit{a priori}
+nonlinear projection estimate at time event $k$ is
+
+\begin{equation*}
+    \hat{\mathbf{x}}_{k|k-1} = \mathbf{f} \left( \hat{\mathbf{x}}_{k-1} \right)
+\end{equation*}
+
+We can linearize $\mathbf{f} \left( \mathbf{x} \right)$ at $\hat{\mathbf{x}}_{k|k-1}$ to
+generate a first-order Taylor approximation $\mathbf{\acute{\Phi}}_{k|k-1}$:
+
+\begin{equation*}
+    \mathbf{\acute{\Phi}}_{k|k-1} = \left. \frac{\partial \mathbf{f}}{\partial \mathbf{x}} \right|_{\hat{\mathbf{x}}_{k|k-1}}
+\end{equation*}
+
+Given our \textit{a priori} projection estimate, $\hat{\mathbf{x}}_{k|k-1}$, we can
+estimate the corresponding nonlinear projection observation from
+
+\begin{equation*}
+    \hat{\mathbf{z}}_{k} = \mathbf{h} \left( \hat{\mathbf{x}}_{k|k-1} \right)
+\end{equation*}
+
+We can also linearize $\mathbf{h} \left( \mathbf{x} \right)$ at $\hat{\mathbf{x}}_{k|k-1}$
+to generate a first-order Taylor approximation $\mathbf{\acute{H}}_k$:
+
+\begin{equation*}
+    \mathbf{\acute{H}}_{k} = \left. \frac{\partial \mathbf{h}}{\partial \mathbf{x}} \right|_{\hat{\mathbf{x}}_{k|k-1}}
+\end{equation*}
+
+The extended Kalman filter update cycle for a nonlinear system is then
+
+I. Projection (\textit{a priori}) update:
+
+\begin{equation*}
+    \begin{aligned}
+        \hat{\mathbf{x}}_{k|k-1} &= \mathbf{f} \left( \hat{\mathbf{x}}_{k-1} \right) \\
+        \mathbf{\acute{\Phi}}_{k|k-1} &= \left. \frac{\partial \mathbf{f}}{\partial \mathbf{x}} \right|_{\hat{\mathbf{x}}_{k|k-1}} \\
+        \mathbf{P}_{k|k-1} &= \mathbf{\acute{\Phi}}_{k|k-1} \, \mathbf{P}_{k-1} \, \mathbf{\acute{\Phi}}_{k|k-1}^T + \mathbf{\Gamma}_{k|k-1} \mathbf{Q}_{k-1} \mathbf{\Gamma}_{k|k-1}^T
+    \end{aligned}
+\end{equation*}
+
+II. Correction (\textit{a posteriori}) update:
+
+\begin{equation*}
+    \begin{aligned}
+        \hat{\mathbf{z}}_{k} &= \mathbf{h} \left( \hat{\mathbf{x}}_{k|k-1} \right) \\
+        \tilde{\mathbf{z}}_k &= \mathbf{z}_k - \hat{\mathbf{z}}_k \\
+        \mathbf{\acute{H}}_{k} &= \left. \frac{\partial \mathbf{h}}{\partial \mathbf{x}} \right|_{\hat{\mathbf{x}}_{k|k-1}} \\
+        \mathbf{S}_{k} &= \mathbf{\acute{H}}_{k} \, \mathbf{P}_{k|k-1} \, \mathbf{\acute{H}}_{k}^T + \mathbf{R}_{k} \\
+        \mathbf{K}_{k} &= \mathbf{P}_{k|k-1} \, \mathbf{\acute{H}}_{k}^T \, \mathbf{S}_{k}^{-1} \\
+        \hat{\mathbf{x}}_k &= \hat{\mathbf{x}}_{k|k-1} +\mathbf{K}_k \, \tilde{\mathbf{z}}_k \\
+        \mathbf{P}_k &= \mathbf{P}_{k|k-1} - \mathbf{K}_{k} \, \mathbf{S}_{k} \, \mathbf{K}_{k}^T
+    \end{aligned}
+\end{equation*}
+
