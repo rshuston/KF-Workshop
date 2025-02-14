@@ -17,7 +17,7 @@ $\mathbf{\Gamma}$ is an $n \times p$ disturbance distribution matrix,
 and $\mathbf{w}$ is a $p \times 1$ white process noise sequence of random disturbances with covariance
 
 \begin{equation*}
-    E \left\{ \mathbf{w}_k \mathbf{w}_k^T \right\} = \mathbf{Q}_k
+    \mathbf{Q}_k = E \left\{ \mathbf{w}_k \mathbf{w}_k^T \right\}
 \end{equation*}
 
 and where $\mathbf{z}$ is an $m \times 1$ observation vector,
@@ -25,7 +25,7 @@ $\mathbf{H}$ is an $m \times n$ observation transformation matrix,
 and $\mathbf{v}_k$ is an $m \times 1$ white error noise sequence of random observation errors with covariance
 
 \begin{equation*}
-    E \left\{ \mathbf{v}_k \mathbf{v}_k^T \right\} = \mathbf{R}_k
+    \mathbf{R}_k = E \left\{ \mathbf{v}_k \mathbf{v}_k^T \right\}
 \end{equation*}
 
 and where both the process and observation noise sequences are uncorrelated

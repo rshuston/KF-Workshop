@@ -14,7 +14,7 @@ $\mathbf{\Gamma}$ is an $n \times p$ disturbance distribution matrix,
 and $\mathbf{w}$ is a $p \times 1$ white process noise sequence of random disturbances with covariance
 
 \begin{equation}
-    E \left\{ \mathbf{w}_k \mathbf{w}_k^T \right\} = \mathbf{Q}_k
+    \mathbf{Q}_k = E \left\{ \mathbf{w}_k \mathbf{w}_k^T \right\}
     \label{eq:process-noise-covariance}
 \end{equation}
 
@@ -30,7 +30,7 @@ $\mathbf{H}$ is an $m \times n$ observation transformation matrix,
 and $\mathbf{v}_k$ is an $m \times 1$ white error noise sequence of random observation errors with covariance
 
 \begin{equation}
-    E \left\{ \mathbf{v}_k \mathbf{v}_k^T \right\} = \mathbf{R}_k
+    \mathbf{R}_k = E \left\{ \mathbf{v}_k \mathbf{v}_k^T \right\}
     \label{eq:observation-noise-covariance}
 \end{equation}
 
@@ -42,9 +42,10 @@ The process and observation noise sequences are uncorrelated
 
 We wish to develop an optimal estimation of the state
 
-\begin{equation*}
+\begin{equation}
     \hat{\mathbf{x}}_k = E \left\{ \mathbf{x}_k \right\}
-\end{equation*}
+    \label{eq:state-estimate}
+\end{equation}
 
 where the state estimation error is
 
@@ -54,12 +55,13 @@ where the state estimation error is
 
 and the covariance of the state estimation error is
 
-\begin{equation*}
+\begin{equation}
     \begin{aligned}
         \mathbf{P}_k &= E \left\{ \mathbf{e}_k \mathbf{e}_k^T \right\} \\
         &= E \left\{ \left[ \mathbf{x}_{k} - \hat{\mathbf{x}}_k \right] \left[ \mathbf{x}_{k} - \hat{\mathbf{x}}_k \right]^T \right\}
     \end{aligned}
-\end{equation*}
+    \label{eq:state-estimate-error-covariance}
+\end{equation}
 
 The estimation error sequence is uncorrelated with both the process and observation noise sequences
 
@@ -295,9 +297,10 @@ Define
 
 Therefore $\mathbf{S}_k$ is the covariance of the observation residual
 
-\begin{equation*}
+\begin{equation}
     \mathbf{S}_k = E \left\{ \tilde{\mathbf{z}}_k \tilde{\mathbf{z}}_k^T \right\}
-\end{equation*}
+    \label{eq:observation-residual-covariance-Ezzt}
+\end{equation}
 
 Observe that $\mathbf{S}_k$ is a square, symmetric matrix, and so
 
@@ -909,9 +912,9 @@ cross covariance “divided by” the observation residual covariance. Another v
 that the filter gain is simply the cross covariance weighted by the inverse of the residual
 covariance, which is essentially a variance normalization operation.
 
-Observe that, for the linear Kalman filter, the observation estimate, $\hat{\mathbf{z}}_k$,
+Recall that, for the linear Kalman filter, the observation estimate, $\hat{\mathbf{z}}_k$,
 observation residual covariance, $\mathbf{S}_k$, and the filter correction gain, $\mathbf{K}_k$,
-are the only calculations that rely on $\mathbf{K}_k$. As we’ve just discovered,
+are the only calculations that rely on $\mathbf{H}_k$. As we’ve just discovered,
 $\mathbf{P}_{\mathbf{zz},k}$ and $\mathbf{P}_{\mathbf{xz},k}$ are the components of $\mathbf{S}_k$,
 and $\mathbf{K}_k$, respectively, that directly rely on $\mathbf{H}_k$. As will be seen shortly,
 the unscented Kalman filter in \S\ref{The Unscented Kalman Filter} determines
