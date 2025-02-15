@@ -94,19 +94,23 @@ The steady-state form of the Kalman filter is then
 
 I. Projection (\textit{a priori}) update:
 
-\begin{equation*}
-    \hat{\mathbf{x}}_{k|k-1} = \mathbf{\Phi} \hat{\mathbf{x}}_{k-1}
-\end{equation*}
+\begingroup
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{l l}
+\phantom{.} & $\hat{\mathbf{x}}_{k|k-1} = \mathbf{\Phi} \hat{\mathbf{x}}_{k-1}$
+\end{tabular}
+\endgroup
 
 II. Correction (\textit{a posteriori}) update:
 
-\begin{equation*}
-    \begin{aligned}
-        \hat{\mathbf{z}}_k &= \mathbf{H} \hat{\mathbf{x}}_{k|k-1} \\
-        \tilde{\mathbf{z}}_k &= \mathbf{z}_k - \hat{\mathbf{z}}_k \\
-        \hat{\mathbf{x}}_k &= \hat{\mathbf{x}}_{k|k-1} +\mathbf{K}_{\infty} \, \tilde{\mathbf{z}}_k
-    \end{aligned}
-\end{equation*}
+\begingroup
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{l l}
+\phantom{.} & $\hat{\mathbf{z}}_k = \mathbf{H} \hat{\mathbf{x}}_{k|k-1}$ \\
+\phantom{.} & $\tilde{\mathbf{z}}_k = \mathbf{z}_k - \hat{\mathbf{z}}_k$ \\
+\phantom{.} & $\hat{\mathbf{x}}_k = \hat{\mathbf{x}}_{k|k-1} +\mathbf{K}_{\infty} \, \tilde{\mathbf{z}}_k$
+\end{tabular}
+\endgroup
 
 The steady-state Kalman filter can be useful in certain applications where processing
 resources are limited and a fixed-gain solution is deemed sufficient for the application.

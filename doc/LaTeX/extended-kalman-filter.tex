@@ -31,7 +31,7 @@ function, and $\mathbf{v}_k$ is an $m \times 1$ white noise sequence with covari
 The process and observation noise sequences are uncorrelated
 
 \begin{equation*}
-    E \left\{ \mathbf{w}_j \mathbf{v}_k^T \right\} = \mathbf{0} \, , \phantom{.} \mathrm{for} \, \mathrm{all} \, j \, \mathrm{and} \, k
+    E \left\{ \mathbf{w}_i \mathbf{v}_j^T \right\} = \mathbf{0} \, , \phantom{.} \mathrm{for} \, \mathrm{all} \, i \, \mathrm{and} \, j
 \end{equation*}
 
 Given a previously determined state estimate, $\hat{\mathbf{x}}_{k-1}$, the \textit{a priori}
@@ -66,25 +66,27 @@ The extended Kalman filter update cycle for a nonlinear system is then
 
 I. Projection (\textit{a priori}) update:
 
-\begin{equation*}
-    \begin{aligned}
-        \hat{\mathbf{x}}_{k|k-1} &= \mathbf{f} \left( \hat{\mathbf{x}}_{k-1} \right) \\
-        \mathbf{\acute{\Phi}}_{k|k-1} &= \left. \frac{\partial \mathbf{f}}{\partial \mathbf{x}} \right|_{\hat{\mathbf{x}}_{k|k-1}} \\
-        \mathbf{P}_{k|k-1} &= \mathbf{\acute{\Phi}}_{k|k-1} \, \mathbf{P}_{k-1} \, \mathbf{\acute{\Phi}}_{k|k-1}^T + \mathbf{\Gamma}_{k|k-1} \mathbf{Q}_{k-1} \mathbf{\Gamma}_{k|k-1}^T
-    \end{aligned}
-\end{equation*}
+\begingroup
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{l l}
+\phantom{.} & $\hat{\mathbf{x}}_{k|k-1} = \mathbf{f} \left( \hat{\mathbf{x}}_{k-1} \right)$ \\
+\phantom{.} & $\mathbf{\acute{\Phi}}_{k|k-1} = \left. \displaystyle{\frac{\partial \mathbf{f}}{\partial \mathbf{x}}} \right|_{\hat{\mathbf{x}}_{k|k-1}}$ \\
+\phantom{.} & $\mathbf{P}_{k|k-1} = \mathbf{\acute{\Phi}}_{k|k-1} \, \mathbf{P}_{k-1} \, \mathbf{\acute{\Phi}}_{k|k-1}^T + \mathbf{\Gamma}_{k|k-1} \mathbf{Q}_{k-1} \mathbf{\Gamma}_{k|k-1}^T$
+\end{tabular}
+\endgroup
 
 II. Correction (\textit{a posteriori}) update:
 
-\begin{equation*}
-    \begin{aligned}
-        \hat{\mathbf{z}}_{k} &= \mathbf{h} \left( \hat{\mathbf{x}}_{k|k-1} \right) \\
-        \tilde{\mathbf{z}}_k &= \mathbf{z}_k - \hat{\mathbf{z}}_k \\
-        \mathbf{\acute{H}}_{k} &= \left. \frac{\partial \mathbf{h}}{\partial \mathbf{x}} \right|_{\hat{\mathbf{x}}_{k|k-1}} \\
-        \mathbf{S}_{k} &= \mathbf{\acute{H}}_{k} \, \mathbf{P}_{k|k-1} \, \mathbf{\acute{H}}_{k}^T + \mathbf{R}_{k} \\
-        \mathbf{K}_{k} &= \mathbf{P}_{k|k-1} \, \mathbf{\acute{H}}_{k}^T \, \mathbf{S}_{k}^{-1} \\
-        \hat{\mathbf{x}}_k &= \hat{\mathbf{x}}_{k|k-1} +\mathbf{K}_k \, \tilde{\mathbf{z}}_k \\
-        \mathbf{P}_k &= \mathbf{P}_{k|k-1} - \mathbf{K}_{k} \, \mathbf{S}_{k} \, \mathbf{K}_{k}^T
-    \end{aligned}
-\end{equation*}
+\begingroup
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{l l}
+\phantom{.} & $\hat{\mathbf{z}}_{k} = \mathbf{h} \left( \hat{\mathbf{x}}_{k|k-1} \right)$ \\
+\phantom{.} & $\tilde{\mathbf{z}}_k = \mathbf{z}_k - \hat{\mathbf{z}}_k$ \\
+\phantom{.} & $\mathbf{\acute{H}}_{k} = \left. \displaystyle{\frac{\partial \mathbf{h}}{\partial \mathbf{x}}} \right|_{\hat{\mathbf{x}}_{k|k-1}}$ \\
+\phantom{.} & $\mathbf{S}_{k} = \mathbf{\acute{H}}_{k} \, \mathbf{P}_{k|k-1} \, \mathbf{\acute{H}}_{k}^T + \mathbf{R}_{k}$ \\
+\phantom{.} & $\mathbf{K}_{k} = \mathbf{P}_{k|k-1} \, \mathbf{\acute{H}}_{k}^T \, \mathbf{S}_{k}^{-1}$ \\
+\phantom{.} & $\hat{\mathbf{x}}_k = \hat{\mathbf{x}}_{k|k-1} +\mathbf{K}_k \, \tilde{\mathbf{z}}_k$ \\
+\phantom{.} & $\mathbf{P}_k = \mathbf{P}_{k|k-1} - \mathbf{K}_{k} \, \mathbf{S}_{k} \, \mathbf{K}_{k}^T$
+\end{tabular}
+\endgroup
 

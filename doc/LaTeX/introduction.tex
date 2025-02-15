@@ -31,7 +31,7 @@ and $\mathbf{v}_k$ is an $m \times 1$ white error noise sequence of random obser
 and where both the process and observation noise sequences are uncorrelated
 
 \begin{equation*}
-    E \left\{ \mathbf{w}_j \mathbf{v}_k^T \right\} = \mathbf{0} \, , \phantom{.} \mathrm{for} \, \mathrm{all} \, j \, \mathrm{and} \, k
+    E \left\{ \mathbf{w}_i \mathbf{v}_j^T \right\} = \mathbf{0} \, , \phantom{.} \mathrm{for} \, \mathrm{all} \, i \, \mathrm{and} \, j
 \end{equation*}
 
 Figure \ref{fig:dt-linear-system} diagrammatically depicts the linear system model.
@@ -72,25 +72,27 @@ a "projection" or \textit{a priori} update, and a "correction" or \textit{a post
 
 I. Projection (\textit{a priori}) update:
 
-\begin{equation*}
-    \begin{aligned}
-        \hat{\mathbf{x}}_{k|k-1} &= \mathbf{\Phi}_{k|k-1} \hat{\mathbf{x}}_{k-1} + \mathbf{u}_{k-1} \\
-        \mathbf{P}_{k|k-1} &= \mathbf{\Phi}_{k|k-1} \mathbf{P}_{k-1} \mathbf{\Phi}_{k|k-1}^T + \mathbf{\Gamma}_{k|k-1} \mathbf{Q}_{k-1} \mathbf{\Gamma}_{k|k-1}^T
-    \end{aligned}
-\end{equation*}
+\begingroup
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{l l}
+\phantom{.} & $\hat{\mathbf{x}}_{k|k-1} = \mathbf{\Phi}_{k|k-1} \hat{\mathbf{x}}_{k-1} + \mathbf{u}_{k-1}$ \\
+\phantom{.} & $\mathbf{P}_{k|k-1} = \mathbf{\Phi}_{k|k-1} \mathbf{P}_{k-1} \mathbf{\Phi}_{k|k-1}^T + \mathbf{\Gamma}_{k|k-1} \mathbf{Q}_{k-1} \mathbf{\Gamma}_{k|k-1}^T$
+\end{tabular}
+\endgroup
 
 II. Correction (\textit{a posteriori}) update:
 
-\begin{equation*}
-    \begin{aligned}
-        \hat{\mathbf{z}}_k &= \mathbf{H}_k \hat{\mathbf{x}}_{k|k-1} \\
-        \tilde{\mathbf{z}}_k &= \mathbf{z}_k - \hat{\mathbf{z}}_k \\
-        \mathbf{S}_k &= \mathbf{H}_k \mathbf{P}_{k|k-1} \mathbf{H}_k^T + \mathbf{R}_k \\
-        \mathbf{K}_k &= \mathbf{P}_{k|k-1} \mathbf{H}_{k}^T \mathbf{S}_k^{-1} \\
-        \hat{\mathbf{x}}_k &= \hat{\mathbf{x}}_{k|k-1} +\mathbf{K}_k \tilde{\mathbf{z}}_k \\
-        \mathbf{P}_k &= \left[ \mathbf{I} - \mathbf{K}_k \mathbf{H}_k \right] \mathbf{P}_{k|k-1}
-    \end{aligned}
-\end{equation*}
+\begingroup
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{l l}
+\phantom{.} & $\hat{\mathbf{z}}_k = \mathbf{H}_k \hat{\mathbf{x}}_{k|k-1}$ \\
+\phantom{.} & $\tilde{\mathbf{z}}_k = \mathbf{z}_k - \hat{\mathbf{z}}_k$ \\
+\phantom{.} & $\mathbf{S}_k = \mathbf{H}_k \mathbf{P}_{k|k-1} \mathbf{H}_k^T + \mathbf{R}_k$ \\
+\phantom{.} & $\mathbf{K}_k = \mathbf{P}_{k|k-1} \mathbf{H}_{k}^T \mathbf{S}_k^{-1}$ \\
+\phantom{.} & $\hat{\mathbf{x}}_k = \hat{\mathbf{x}}_{k|k-1} +\mathbf{K}_k \tilde{\mathbf{z}}_k$ \\
+\phantom{.} & $\mathbf{P}_k = \left[ \mathbf{I} - \mathbf{K}_k \mathbf{H}_k \right] \mathbf{P}_{k|k-1}$
+\end{tabular}
+\endgroup
 
 Figure \ref{fig:kf-diagram} diagrammatically depicts the Kalman filter.
 

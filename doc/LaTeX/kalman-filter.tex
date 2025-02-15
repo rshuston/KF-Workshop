@@ -11,7 +11,8 @@ We begin with the unforced linear system dynamical process model
 where $\mathbf{x}$ is an $n \times 1$ state vector,
 $\mathbf{\Phi}$ is an $n \times n$ state transition matrix,
 $\mathbf{\Gamma}$ is an $n \times p$ disturbance distribution matrix,
-and $\mathbf{w}$ is a $p \times 1$ white process noise sequence of random disturbances with covariance
+and $\mathbf{w}$ is a $p \times 1$ white process noise sequence of random disturbances
+with covariance
 
 \begin{equation}
     \mathbf{Q}_k = E \left\{ \mathbf{w}_k \mathbf{w}_k^T \right\}
@@ -27,7 +28,8 @@ We also have a linear observation model
 
 and where $\mathbf{z}$ is an $m \times 1$ observation vector,
 $\mathbf{H}$ is an $m \times n$ observation transformation matrix,
-and $\mathbf{v}_k$ is an $m \times 1$ white error noise sequence of random observation errors with covariance
+and $\mathbf{v}_k$ is an $m \times 1$ white error noise sequence of random observation
+errors with covariance
 
 \begin{equation}
     \mathbf{R}_k = E \left\{ \mathbf{v}_k \mathbf{v}_k^T \right\}
@@ -37,23 +39,33 @@ and $\mathbf{v}_k$ is an $m \times 1$ white error noise sequence of random obser
 The process and observation noise sequences are uncorrelated
 
 \begin{equation*}
-    E \left\{ \mathbf{w}_j \mathbf{v}_k^T \right\} = \mathbf{0} \, , \phantom{.} \mathrm{for} \, \mathrm{all} \, j \, \mathrm{and} \, k
+    E \left\{ \mathbf{w}_i \mathbf{v}_j^T \right\} = \mathbf{0} \, , \phantom{.} \mathrm{for} \, \mathrm{all} \, i \, \mathrm{and} \, j
 \end{equation*}
 
-We wish to develop an optimal estimation of the state
+Our objective is to develop an optimal estimation of the state
 
 \begin{equation}
     \hat{\mathbf{x}}_k = E \left\{ \mathbf{x}_k \right\}
     \label{eq:state-estimate}
 \end{equation}
 
-where the state estimation error is
+where the state estimation error
 
 \begin{equation*}
     \mathbf{e}_k = \mathbf{x}_{k} - \hat{\mathbf{x}}_k
 \end{equation*}
 
-and the covariance of the state estimation error is
+is uncorrelated with both the process and observation noise sequences
+
+\begin{equation*}
+    \begin{aligned}
+        E \left\{ \mathbf{e}_i \mathbf{w}_j^T \right\} &= \mathbf{0} \, , \phantom{.} \mathrm{for} \, \mathrm{all} \, i \, \mathrm{and} \, j \\
+        \phantom{.} \\
+        E \left\{ \mathbf{e}_i \mathbf{v}_j^T \right\} &= \mathbf{0} \, , \phantom{.} \mathrm{for} \, \mathrm{all} \, i \, \mathrm{and} \, j
+    \end{aligned}
+\end{equation*}
+
+The covariance of the state estimation error is
 
 \begin{equation}
     \begin{aligned}
@@ -63,17 +75,12 @@ and the covariance of the state estimation error is
     \label{eq:state-estimate-error-covariance}
 \end{equation}
 
-The estimation error sequence is uncorrelated with both the process and observation noise sequences
+So what do we mean by "optimal estimation of the state?" Our criterion for optimality will
+be to minimize the diagonal elements of $\mathbf{P}_k$. In other words, we wish to develop
+a state estimate that minimizes the state estimation error variances.
 
-\begin{equation*}
-    \begin{aligned}
-        E \left\{ \mathbf{e}_j \mathbf{w}_k^T \right\} &= \mathbf{0} \, , \phantom{.} \mathrm{for} \, \mathrm{all} \, j \, \mathrm{and} \, k \\
-        \phantom{.} \\
-        E \left\{ \mathbf{e}_j \mathbf{v}_k^T \right\} &= \mathbf{0} \, , \phantom{.} \mathrm{for} \, \mathrm{all} \, j \, \mathrm{and} \, k
-    \end{aligned}
-\end{equation*}
-
-Observe that the system dynamical model tells us that the state for time event $k$ is given by
+Observe that the system dynamical model tells us that the state for time event $k$ is
+given by
 
 \begin{equation*}
     \mathbf{x}_{k} = \mathbf{\Phi}_{k|k-1} \mathbf{x}_{k-1} + \mathbf{\Gamma}_{k|k-1} \mathbf{w}_{k-1}
@@ -118,7 +125,8 @@ $\mathbf{e}_{k|k-1}$ gives
     \end{aligned}
 \end{equation*}
 
-At this point, it will be helpful to introduce two useful lemmas for equations of this form.
+At this point, it will be helpful to introduce two useful lemmas for equations of this
+form.
 
 \boxed{
 \parbox{\textwidth}{
@@ -432,7 +440,7 @@ Then the expression for $\mathbf{P}_k$ becomes
 
 What we wish to do is find the value of $\mathbf{K}_k$ that minimizes the diagonal
 elements of $\mathbf{P}_k$. In other words, we want the value of $\mathbf{K}_k$ that
-minimizes the state estimate error variances. To do this, we need to find the value of
+minimizes the state estimation error variances. To do this, we need to find the value of
 $\mathbf{K}_k$ that causes
 
 \begin{equation*}
@@ -747,25 +755,27 @@ The Kalman filter update cycle for an unforced system (i.e., no control input) i
 
 I. Projection (\textit{a priori}) update:
 
-\begin{equation*}
-    \begin{aligned}
-        \hat{\mathbf{x}}_{k|k-1} &= \mathbf{\Phi}_{k|k-1} \hat{\mathbf{x}}_{k-1} \\
-        \mathbf{P}_{k|k-1} &= \mathbf{\Phi}_{k|k-1} \, \mathbf{P}_{k-1} \, \mathbf{\Phi}_{k|k-1}^T + \mathbf{\Gamma}_{k|k-1} \mathbf{Q}_{k-1} \mathbf{\Gamma}_{k|k-1}^T
-    \end{aligned}
-\end{equation*}
+\begingroup
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{l l}
+\phantom{.} & $\hat{\mathbf{x}}_{k|k-1} = \mathbf{\Phi}_{k|k-1} \hat{\mathbf{x}}_{k-1}$ \\
+\phantom{.} & $\mathbf{P}_{k|k-1} = \mathbf{\Phi}_{k|k-1} \mathbf{P}_{k-1} \mathbf{\Phi}_{k|k-1}^T + \mathbf{\Gamma}_{k|k-1} \mathbf{Q}_{k-1} \mathbf{\Gamma}_{k|k-1}^T$
+\end{tabular}
+\endgroup
 
 II. Correction (\textit{a posteriori}) update:
 
-\begin{equation*}
-    \begin{aligned}
-        \hat{\mathbf{z}}_k &= \mathbf{H}_k \hat{\mathbf{x}}_{k|k-1} \\
-        \tilde{\mathbf{z}}_k &= \mathbf{z}_k - \hat{\mathbf{z}}_k \\
-        \mathbf{S}_{k} &= \mathbf{H}_{k} \, \mathbf{P}_{k|k-1} \, \mathbf{H}_{k}^T + \mathbf{R}_{k} \\
-        \mathbf{K}_{k} &= \mathbf{P}_{k|k-1} \, \mathbf{H}_{k}^T \, \mathbf{S}_{k}^{-1} \\
-        \hat{\mathbf{x}}_k &= \hat{\mathbf{x}}_{k|k-1} +\mathbf{K}_k \, \tilde{\mathbf{z}}_k \\
-        \mathbf{P}_k &= \mathbf{P}_{k|k-1} - \mathbf{K}_{k} \, \mathbf{S}_{k} \, \mathbf{K}_{k}^T
-    \end{aligned}
-\end{equation*}
+\begingroup
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{l l}
+\phantom{.} & $\hat{\mathbf{z}}_k = \mathbf{H}_k \hat{\mathbf{x}}_{k|k-1}$ \\
+\phantom{.} & $\tilde{\mathbf{z}}_k = \mathbf{z}_k - \hat{\mathbf{z}}_k$ \\
+\phantom{.} & $\mathbf{S}_k = \mathbf{H}_k \mathbf{P}_{k|k-1} \mathbf{H}_k^T + \mathbf{R}_k$ \\
+\phantom{.} & $\mathbf{K}_k = \mathbf{P}_{k|k-1} \mathbf{H}_{k}^T \mathbf{S}_k^{-1}$ \\
+\phantom{.} & $\hat{\mathbf{x}}_k = \hat{\mathbf{x}}_{k|k-1} +\mathbf{K}_k \tilde{\mathbf{z}}_k$ \\
+\phantom{.} & $\mathbf{P}_k = \mathbf{P}_{k|k-1} - \mathbf{K}_{k} \, \mathbf{S}_{k} \, \mathbf{K}_{k}^T$
+\end{tabular}
+\endgroup
 
 For a forced input system, the system dynamical and observation modeling equations are
 
@@ -787,25 +797,27 @@ and so the Kalman filter update cycle for a forced input system is
 
 I. Projection (\textit{a priori}) update:
 
-\begin{equation*}
-    \begin{aligned}
-        \hat{\mathbf{x}}_{k|k-1} &= \mathbf{\Phi}_{k|k-1} \hat{\mathbf{x}}_{k-1} + \mathbf{u}_{k-1} \\
-        \mathbf{P}_{k|k-1} &= \mathbf{\Phi}_{k|k-1} \, \mathbf{P}_{k-1} \, \mathbf{\Phi}_{k|k-1}^T + \mathbf{\Gamma}_{k|k-1} \mathbf{Q}_{k-1} \mathbf{\Gamma}_{k|k-1}^T
-    \end{aligned}
-\end{equation*}
+\begingroup
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{l l}
+\phantom{.} & $\hat{\mathbf{x}}_{k|k-1} = \mathbf{\Phi}_{k|k-1} \hat{\mathbf{x}}_{k-1} + \mathbf{u}_{k-1}$ \\
+\phantom{.} & $\mathbf{P}_{k|k-1} = \mathbf{\Phi}_{k|k-1} \mathbf{P}_{k-1} \mathbf{\Phi}_{k|k-1}^T + \mathbf{\Gamma}_{k|k-1} \mathbf{Q}_{k-1} \mathbf{\Gamma}_{k|k-1}^T$
+\end{tabular}
+\endgroup
 
 II. Correction (\textit{a posteriori}) update:
 
-\begin{equation*}
-    \begin{aligned}
-        \hat{\mathbf{z}}_k &= \mathbf{H}_k \hat{\mathbf{x}}_{k|k-1} \\
-        \tilde{\mathbf{z}}_k &= \mathbf{z}_k - \hat{\mathbf{z}}_k \\
-        \mathbf{S}_{k} &= \mathbf{H}_{k} \, \mathbf{P}_{k|k-1} \, \mathbf{H}_{k}^T + \mathbf{R}_{k} \\
-        \mathbf{K}_{k} &= \mathbf{P}_{k|k-1} \, \mathbf{H}_{k}^T \, \mathbf{S}_{k}^{-1} \\
-        \hat{\mathbf{x}}_k &= \hat{\mathbf{x}}_{k|k-1} +\mathbf{K}_k \, \tilde{\mathbf{z}}_k \\
-        \mathbf{P}_k &= \mathbf{P}_{k|k-1} - \mathbf{K}_{k} \, \mathbf{S}_{k} \, \mathbf{K}_{k}^T
-    \end{aligned}
-\end{equation*}
+\begingroup
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{l l}
+\phantom{.} & $\hat{\mathbf{z}}_k = \mathbf{H}_k \hat{\mathbf{x}}_{k|k-1}$ \\
+\phantom{.} & $\tilde{\mathbf{z}}_k = \mathbf{z}_k - \hat{\mathbf{z}}_k$ \\
+\phantom{.} & $\mathbf{S}_k = \mathbf{H}_k \mathbf{P}_{k|k-1} \mathbf{H}_k^T + \mathbf{R}_k$ \\
+\phantom{.} & $\mathbf{K}_k = \mathbf{P}_{k|k-1} \mathbf{H}_{k}^T \mathbf{S}_k^{-1}$ \\
+\phantom{.} & $\hat{\mathbf{x}}_k = \hat{\mathbf{x}}_{k|k-1} +\mathbf{K}_k \tilde{\mathbf{z}}_k$ \\
+\phantom{.} & $\mathbf{P}_k = \mathbf{P}_{k|k-1} - \mathbf{K}_{k} \, \mathbf{S}_{k} \, \mathbf{K}_{k}^T$
+\end{tabular}
+\endgroup
 
 Before concluding this section, it is worth introducing two additional covariance matrices,
 particularly since they are relevant to the unscented Kalman filter formulation in

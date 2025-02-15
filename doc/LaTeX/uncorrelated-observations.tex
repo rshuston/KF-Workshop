@@ -60,7 +60,7 @@ Algorithm \ref{alg:SequentialCorrection} below.
         \FOR{$i = 1$ \textbf{to} $m$}
             \STATE $\tilde{z}^{(i)} = z^{(i)} - \mathbf{h}^{(i)} \mathbf{x}^{(i-1)}$
             \STATE $s^{(i)} = \mathbf{h}^{(i)} \mathbf{P}^{(i-1)} {\mathbf{h}^{(i)}}^T + r^{(i)}$
-            \STATE $\mathbf{k}^{(i)} = \mathbf{P}^{(i-1)} {\mathbf{h}^{(i)}}^T \left( \frac { 1 } { s^{(i)} } \right)$
+            \STATE $\mathbf{k}^{(i)} = \mathbf{P}^{(i-1)} {\mathbf{h}^{(i)}}^T \left( \displaystyle{\frac { 1 } { s^{(i)} }} \right)$
             \STATE $\mathbf{x}^{(i)} = \mathbf{x}^{(i-1)} + \mathbf{k}^{(i)} \tilde{z}^{(i)}$
             \STATE $\mathbf{P}^{(i)}  = \mathbf{P}^{(i-1)} - \mathbf{k}^{(i)} s^{(i)} \mathbf{k}^{(i)^T}$
         \ENDFOR

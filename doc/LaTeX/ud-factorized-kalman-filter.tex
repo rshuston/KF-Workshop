@@ -23,11 +23,14 @@ U-D factorization.
 We begin the U-D Kalman filter algorithm description by identifying the items to be
 maintained:
 
+\begingroup
+\renewcommand{\arraystretch}{1.25}
 \begin{tabular}{l l}
 $\hat{\mathbf{x}}_k$ & state estimate at time event $k$ \\
 $\mathbf{U}_{P,k}$   & U factor of $\mathbf{P}_k = \mathbf{U}_{P,k} \mathbf{D}_{P,k} \mathbf{U}_{P,k}^T$ at time event $k$ \\
 $\mathbf{D}_{P,k}$   & D factor of $\mathbf{P}_k = \mathbf{U}_{P,k} \mathbf{D}_{P,k} \mathbf{U}_{P,k}^T$ at time event $k$
 \end{tabular}
+\endgroup
 
 The procedure relies on two subalgorithms: \textit{UDProject} and \textit{UDCorrect}.
 Both of these subalgorithms are specified below. In addition, the U-D Kalman filter
@@ -36,6 +39,8 @@ in \S\ref{Uncorrelated Observations} should be used if the observations are corr
 
 I. Projection (\textit{a priori}) update:
 
+\begingroup
+\renewcommand{\arraystretch}{1.25}
 \begin{tabular}{l l}
 \phantom{.} & Compute $\hat{\mathbf{x}}_{k|k-1} = \mathbf{\Phi}_{k|k-1} \hat{\mathbf{x}}_{k-1}$ \\
 \phantom{.} & Factor $\mathbf{Q}_{k-1}$ into $\mathbf{U}_{Q,k-1}$ and $\mathbf{D}_{Q,k-1}$ such that
@@ -46,9 +51,12 @@ I. Projection (\textit{a priori}) update:
 \phantom{.} & Use \textit{UDProject} to propagate $\mathbf{U}_{P,k-1}$ and $\mathbf{D}_{P,k-1}$
     to $\mathbf{U}_{P,k|k-1}$ and $\mathbf{D}_{P,k|k-1}$
 \end{tabular}
+\endgroup
 
 II. Correction (\textit{a posteriori}) update:
 
+\begingroup
+\renewcommand{\arraystretch}{1.25}
 \begin{tabular}{l l}
 \phantom{.} & $\mathbf{x}^{(0)} = \hat{\mathbf{x}}_{k|k-1}$ \\
 \phantom{.} & $\mathbf{U}_P^{(0)} = \mathbf{U}_{P,k|k-1}$ \\
@@ -62,6 +70,7 @@ II. Correction (\textit{a posteriori}) update:
 \phantom{.} & $\mathbf{U}_{P,k} = \mathbf{P}_P^{(m)}$ \\
 \phantom{.} & $\mathbf{D}_{P,k} = \mathbf{D}_P^{(m)}$
 \end{tabular}
+\endgroup
 
 The \textit{UDProject} subalgorithm is based on Thornton’s Modified Weighted Gram-Schmidt (MWGS)
 Orthogonalization procedure \cite{thornton1976}.

@@ -31,7 +31,7 @@ function, and $\mathbf{v}_k$ is an $m \times 1$ white noise sequence with covari
 The process and observation noise sequences are uncorrelated
 
 \begin{equation*}
-    E \left\{ \mathbf{w}_j \mathbf{v}_k^T \right\} = \mathbf{0} \, , \phantom{.} \mathrm{for} \, \mathrm{all} \, j \, \mathrm{and} \, k
+    E \left\{ \mathbf{w}_i \mathbf{v}_j^T \right\} = \mathbf{0} \, , \phantom{.} \mathrm{for} \, \mathrm{all} \, i \, \mathrm{and} \, j
 \end{equation*}
 
 Recall that the extended Kalman filter in \S\ref{The Extended Kalman Filter} approximates
@@ -116,34 +116,35 @@ $\mathbf{X}^{(j)}$, the unscented Kalman filter update cycle for a nonlinear sys
 
 I. Projection (\textit{a priori}) update:
 
-\begin{equation*}
-    \begin{aligned}
-        \mathbf{x}^{(j)} &= \mathbf{f} \left( \mathbf{X}^{(j)} \right) \; , j=0,\dots,2n \\
-        \hat{\mathbf{x}}_{k|k-1} &= \sum_{j=0}^{2n} W^{(j)} \mathbf{x}^{(j)} \\
-        \phantom{X} \\
-        \mathbf{P}_{k|k-1} &= \sum_{j=0}^{2n} W^{(j)} \left[ \mathbf{x}^{(j)} - \hat{\mathbf{x}}_{k|k-1} \right] \left[ \mathbf{x}^{(j)} - \hat{\mathbf{x}}_{k|k-1} \right]^T
-        + \mathbf{\Gamma}_{k|k-1} \mathbf{Q}_{k-1} \mathbf{\Gamma}_{k|k-1}^T
-    \end{aligned}
-\end{equation*}
+\begingroup
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{l l}
+\phantom{.} & $\mathbf{x}^{(j)} = \mathbf{f} \left( \mathbf{X}^{(j)} \right) \; , j=0,\dots,2n$ \\
+\phantom{.} & $\hat{\mathbf{x}}_{k|k-1} = \displaystyle{\sum_{j=0}^{2n}} W^{(j)} \mathbf{x}^{(j)}$ \\
+\phantom{.} \\
+\phantom{.} & $\mathbf{P}_{k|k-1} = \displaystyle{\sum_{j=0}^{2n}} W^{(j)} \left[ \mathbf{x}^{(j)} - \hat{\mathbf{x}}_{k|k-1} \right] \left[ \mathbf{x}^{(j)} - \hat{\mathbf{x}}_{k|k-1} \right]^T
+              + \mathbf{\Gamma}_{k|k-1} \mathbf{Q}_{k-1} \mathbf{\Gamma}_{k|k-1}^T$
+\end{tabular}
+\endgroup
 
 II. Correction (\textit{a posteriori}) update:
 
-\begin{equation*}
-    \begin{aligned}
-        \mathbf{z}^{(j)} &= \mathbf{h} \left( \mathbf{x}^{(j)} \right) \; , j=0,\dots,2n \\
-        \hat{\mathbf{z}}_k &= \sum_{j=0}^{2n} W^{(j)} \mathbf{z}^{(j)} \\
-        \phantom{X} \\
-        \tilde{\mathbf{z}}_k &= \mathbf{z}_k - \hat{\mathbf{z}}_k \\
-        \phantom{X} \\
-        \mathbf{P}_{\mathbf{zz},k} &= \sum_{j=0}^{2n} W^{(j)} \left[ \mathbf{z}^{(j)} - \hat{\mathbf{z}}_k \right] \left[ \mathbf{z}^{(j)} - \hat{\mathbf{z}}_k \right]^T \\
-        \mathbf{P}_{\mathbf{xz},k} &= \sum_{j=0}^{2n} W^{(j)} \left[ \mathbf{x}^{(j)} - \hat{\mathbf{x}}_{k|k-1} \right] \left[ \mathbf{z}^{(j)} - \hat{\mathbf{z}}_k \right]^T \\
-        \phantom{X} \\
-        \mathbf{S}_{k} &= \mathbf{P}_{\mathbf{zz},k} + \mathbf{R}_{k} \\
-        \mathbf{K}_{k} &= \mathbf{P}_{\mathbf{xz},k} \; \mathbf{S}_{k}^{-1} \\
-        \phantom{X} \\
-        \hat{\mathbf{x}}_{k} &= \hat{\mathbf{x}}_{k|k-1} +\mathbf{K}_k \, \tilde{\mathbf{z}}_k \\
-        \mathbf{P}_{k} &= \mathbf{P}_{k|k-1} - \mathbf{K}_k \, \mathbf{S}_k \, \mathbf{K}_k^T
-    \end{aligned}
-\end{equation*}
-
+\begingroup
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{l l}
+\phantom{.} & $\mathbf{z}^{(j)} = \mathbf{h} \left( \mathbf{x}^{(j)} \right) \; , j=0,\dots,2n$ \\
+\phantom{.} & $\hat{\mathbf{z}}_k = \displaystyle{\sum_{j=0}^{2n}} W^{(j)} \mathbf{z}^{(j)}$ \\
+\phantom{.} \\
+\phantom{.} & $\tilde{\mathbf{z}}_k = \mathbf{z}_k - \hat{\mathbf{z}}_k$ \\
+\phantom{.} \\
+\phantom{.} & $\mathbf{P}_{\mathbf{zz},k} = \displaystyle{\sum_{j=0}^{2n}} W^{(j)} \left[ \mathbf{z}^{(j)} - \hat{\mathbf{z}}_k \right] \left[ \mathbf{z}^{(j)} - \hat{\mathbf{z}}_k \right]^T$ \\
+\phantom{.} & $\mathbf{P}_{\mathbf{xz},k} = \displaystyle{\sum_{j=0}^{2n}} W^{(j)} \left[ \mathbf{x}^{(j)} - \hat{\mathbf{x}}_{k|k-1} \right] \left[ \mathbf{z}^{(j)} - \hat{\mathbf{z}}_k \right]^T$ \\
+\phantom{.} \\
+\phantom{.} & $\mathbf{S}_k = \mathbf{P}_{\mathbf{zz},k} + \mathbf{R}_k$ \\
+\phantom{.} & $\mathbf{K}_k = \mathbf{P}_{\mathbf{xz},k} \; \mathbf{S}_k^{-1}$ \\
+\phantom{.} \\
+\phantom{.} & $\hat{\mathbf{x}}_k = \hat{\mathbf{x}}_{k|k-1} +\mathbf{K}_k \, \tilde{\mathbf{z}}_k$ \\
+\phantom{.} & $\mathbf{P}_k = \mathbf{P}_{k|k-1} - \mathbf{K}_k \, \mathbf{S}_k \, \mathbf{K}_k^T$
+\end{tabular}
+\endgroup
 

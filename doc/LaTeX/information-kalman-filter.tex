@@ -435,14 +435,13 @@ and so the Kalman gain can be expressed as
 }
 
 It is important to recognize that this form of the Kalman gain relies on the
-\textit{a posteriori} covariance, $\mathbf{P}_k$. In contrast, the regular form of the
-Kalman gain (\ref{eq:kalman-gain})
+\textit{a posteriori} covariance, $\mathbf{P}_k$. In contrast, the Kalman gain of
+(\ref{eq:kalman-gain}) relies on the \textit{a priori} covariance, $\mathbf{P}_{k|k-1}$:
 
 \begin{equation*}
     \mathbf{K}_k = \mathbf{P}_{k|k-1} \mathbf{H}_k^T \mathbf{S}_k^{-1}
 \end{equation*}
 
-relies on the \textit{a priori} covariance, $\mathbf{P}_{k|k-1}$.
 Hence, the use of the \textit{a posteriori} form of the Kalman gain requires that the
 \textit{a posteriori} state update must be done after the \textit{a posteriori} state
 covariance update and the associated gain evaluation.
@@ -451,33 +450,36 @@ The information form of the Kalman filter update cycle for a forced input system
 
 I. Projection (\textit{a priori}) update:
 
-\begin{equation*}
-    \begin{aligned}
-        \hat{\mathbf{x}}_{k|k-1} &= \mathbf{\Phi}_{k|k-1} \hat{\mathbf{x}}_{k-1} + \mathbf{u}_{k-1} \\
-        \mathbf{P}_{k|k-1} &= \mathbf{\Phi}_{k|k-1} \, \mathbf{P}_{k-1} \, \mathbf{\Phi}_{k|k-1}^T + \mathbf{\Gamma}_{k|k-1} \mathbf{Q}_{k-1} \mathbf{\Gamma}_{k|k-1}^T
-    \end{aligned}
-\end{equation*}
+\begingroup
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{l l}
+\phantom{.} & $\hat{\mathbf{x}}_{k|k-1} = \mathbf{\Phi}_{k|k-1} \hat{\mathbf{x}}_{k-1} + \mathbf{u}_{k-1}$ \\
+\phantom{.} & $\mathbf{P}_{k|k-1} = \mathbf{\Phi}_{k|k-1} \, \mathbf{P}_{k-1} \, \mathbf{\Phi}_{k|k-1}^T + \mathbf{\Gamma}_{k|k-1} \mathbf{Q}_{k-1} \mathbf{\Gamma}_{k|k-1}^T$
+\end{tabular}
+\endgroup
 
 II. Correction (\textit{a posteriori}) update:
 
-\begin{equation*}
-    \begin{aligned}
-        \hat{\mathbf{z}}_k &= \mathbf{H}_k \hat{\mathbf{x}}_{k|k-1} \\
-        \tilde{\mathbf{z}}_k &= \mathbf{z}_k - \hat{\mathbf{z}}_k \\
-        \mathbf{P}_k^{-1} &= \mathbf{P}_{k|k-1}^{-1} + \mathbf{H}_k^T \mathbf{R}_k^{-1} \mathbf{H}_k \\
-        \mathbf{K}_{k} &= \mathbf{P}_k \mathbf{H}_k^T \mathbf{R}_k^{-1} \\
-        \hat{\mathbf{x}}_k &= \hat{\mathbf{x}}_{k|k-1} +\mathbf{K}_k \, \tilde{\mathbf{z}}_k
-    \end{aligned}
-\end{equation*}
+\begingroup
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{l l}
+\phantom{.} & $\hat{\mathbf{z}}_k = \mathbf{H}_k \hat{\mathbf{x}}_{k|k-1}$ \\
+\phantom{.} & $\tilde{\mathbf{z}}_k = \mathbf{z}_k - \hat{\mathbf{z}}_k$ \\
+\phantom{.} & $\mathbf{P}_k^{-1} = \mathbf{P}_{k|k-1}^{-1} + \mathbf{H}_k^T \mathbf{R}_k^{-1} \mathbf{H}_k$ \\
+\phantom{.} & $\mathbf{K}_{k} = \mathbf{P}_k \mathbf{H}_k^T \mathbf{R}_k^{-1}$ \\
+\phantom{.} & $\hat{\mathbf{x}}_k = \hat{\mathbf{x}}_{k|k-1} +\mathbf{K}_k \, \tilde{\mathbf{z}}_k$
+\end{tabular}
+\endgroup
 
-Note that this requires performing an inversion of $\mathbf{P}_{k|k-1}$ and another
-inversion of $\mathbf{P}_k^{-1}$. Also, instead of needing to form and compute
-$\mathbf{S}_k^{-1}$, we compute $\mathbf{R}_k^{-1}$. While the size of $\mathbf{R}_k$
-and $\mathbf{S}_k$ are both $m \times m$, typically $\mathbf{R}_k$ is static across
-successive measurement updates and so $\mathbf{R}_k^{-1}$ needs to computed only once.
-In addition, if $\mathbf{R}_k$ is diagonal, evaluation of $\mathbf{R}_k^{-1}$ is trivial.
+The information form of the Kalman filter requires performing an inversion of
+$\mathbf{P}_{k|k-1}$ and another inversion of $\mathbf{P}_k^{-1}$. Also, instead of
+needing to form and compute $\mathbf{S}_k^{-1}$, we compute $\mathbf{R}_k^{-1}$.
+While the size of $\mathbf{R}_k$ and $\mathbf{S}_k$ are both $m \times m$, typically
+$\mathbf{R}_k$ is static across successive observation updates and so $\mathbf{R}_k^{-1}$
+needs to computed only once. In addition, if $\mathbf{R}_k$ is diagonal, evaluation of
+$\mathbf{R}_k^{-1}$ is trivial.
 
-In general, this form of the Kalman filter is not implemented unless the equations can
-be coded such that they are computationally feasible and can numerically preserve the
-structure of $\mathbf{P}_k$.
+In general, the information form of the Kalman filter is not implemented unless the
+equations can be coded such that they are computationally feasible and can numerically
+preserve the structure of $\mathbf{P}_k$.
 
