@@ -10,19 +10,28 @@ The following filter types are explored:
 - Unscented Kalman Filter (measurement relation ony), Range and Direction Cosine Measurements
 - Unscented Kalman Filter (classic Julier and Uhlmann algorithm), Range and Direction Cosine Measurements
 
-The filters are implemented in Octave, although things should port easily to
-MATLAB.
+Two model types are explored:
+- Constant velocity with acceleration disturbances
+- Constant turn with acceleration disturbances
 
-Five flight scenarios are simulated:
-1. line
+Six flight scenarios are simulated:
+1. circle
 2. curve
-3. circle
-4. wiggle
+3. line
+4. s-curve
 5. square
+6. wiggle
+
+The filters and tests are implemented in Octave, although things should run
+easily in MATLAB.
+
+Run the "setup_env" script in Octave to add the necessary subdirectories to
+the function search path.
 
 To generate plots, run "fly scenario" in Octave, where "scenario" is one of
 the above scenario names. If just "fly" is specified, the "line" scenario is
 run.
 
 An "engineer's derivation" of the Kalman filter and its various forms can be
-found in the `doc` directory.
+found in the `doc` directory. Also, a writeup of the various target motion
+models is given.
