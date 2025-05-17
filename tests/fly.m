@@ -14,6 +14,8 @@ function fly(scenario)
                 [t, n, e] = fly_circle;
             case "curve"
                 [t, n, e] = fly_curve;
+            case "figure-8"
+                [t, n, e] = fly_figure_8;
             case "line"
                 [t, n, e] = fly_line;
             case "s-curve"
@@ -69,20 +71,20 @@ function fly(scenario)
                t, n, e, r, theta, nz, ez, rz, thetaz)
     
     # Unscented Kalman filter
-#    run_filter("UKF", @ukf_cv_init, @ukf_cv_update,
-#               [10.0, 10.0], [0.1], [0.1, 0.1],
-#               t, n, e, r, theta, nz, ez, rz, thetaz)
-#    run_filter("UKF-DC", @ukf_cvdc_init, @ukf_cvdc_update,
-#               [10.0, 10.0], [0.1], [0.1, 0.1],
-#               t, n, e, r, theta, nz, ez, rz, thetaz)
-#    run_filter("UKF-JU-DC", @ukf_ju_cvdc_init, @ukf_ju_cvdc_update,
-#               [10.0, 10.0], [0.1], [0.1, 0.1],
-#               t, n, e, r, theta, nz, ez, rz, thetaz)
+    run_filter("UKF", @ukf_cv_init, @ukf_cv_update,
+               [10.0, 10.0], [0.1], [0.1, 0.1],
+               t, n, e, r, theta, nz, ez, rz, thetaz)
+    run_filter("UKF-DC", @ukf_cvdc_init, @ukf_cvdc_update,
+               [10.0, 10.0], [0.1], [0.1, 0.1],
+               t, n, e, r, theta, nz, ez, rz, thetaz)
+    run_filter("UKF-JU-DC", @ukf_ju_cvdc_init, @ukf_ju_cvdc_update,
+               [10.0, 10.0], [0.1], [0.1, 0.1],
+               t, n, e, r, theta, nz, ez, rz, thetaz)
     
+    # Extended Kalman filter, constant turn
     run_filter("EKF-CT", @ekf_ct_init, @ekf_ct_update,
                [10.0, 10.0, 1.0], [0.1, 0.01], [0.1, 0.1],
                 t, n, e, r, theta, nz, ez, rz, thetaz)
-    
     run_filter("EKF-CT-DC", @ekf_ctdc_init, @ekf_ctdc_update,
                [10.0, 10.0, 1.0], [0.1, 0.01], [0.1, 0.1],
                 t, n, e, r, theta, nz, ez, rz, thetaz)
