@@ -1,5 +1,5 @@
-printf("=================================\n");
-printf("Setting up project environment...\n");
-printf("=================================\n");
+fprintf("=================================\n");
+fprintf("Setting up project environment...\n");
+fprintf("=================================\n");
 setup_env;
 

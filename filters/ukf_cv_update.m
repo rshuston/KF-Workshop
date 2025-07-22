@@ -1,6 +1,6 @@
-# This version of the UKF only approximates the measurement relation, and uses
-# different weights for mean (Wm) and covariance (Wc) sums. It also manually
-# accounts for angles crossing the [-pi, pi) boundary.
+% This version of the UKF only approximates the measurement relation, and uses
+% different weights for mean (Wm) and covariance (Wc) sums. It also manually
+% accounts for angles crossing the [-pi, pi) boundary.
 
 function s_k = ukf_cv_update(t, s_km1, r, theta, proc_vars, meas_vars)
     
@@ -26,7 +26,7 @@ function s_k = ukf_cv_update(t, s_km1, r, theta, proc_vars, meas_vars)
     R = [ var_r , 0         ;
           0     , var_theta ];
     
-    # Prediction
+    % Prediction
     
     Phi = [1 , T , 0 , 0;
            0 , 1 , 0 , 0;
@@ -45,7 +45,7 @@ function s_k = ukf_cv_update(t, s_km1, r, theta, proc_vars, meas_vars)
     xp = Phi * x;
     Pp = Phi * P * Phi' + Q;
     
-    # Compute sigma points and weights
+    % Compute sigma points and weights
     
     L = sqrt_N_plus_lambda * chol(Pp, "lower");
     
@@ -54,9 +54,9 @@ function s_k = ukf_cv_update(t, s_km1, r, theta, proc_vars, meas_vars)
     for i = 2:N+1
         X(:,i) = xp + L(:,i-1);
         X(:,i + N) = xp - L(:,i-1);
-    endfor
+    end
     
-    # Compute predicted measurement, saving intermediate results
+    % Compute predicted measurement, saving intermediate results
     theta_ref = atan2(xp(3), xp(1));
     farside = (theta_ref > half_pi || theta_ref < -half_pi);
     
@@ -69,15 +69,15 @@ function s_k = ukf_cv_update(t, s_km1, r, theta, proc_vars, meas_vars)
                   atan2(X_i(3), X_i(1))                   ];
         if (farside)
             h_X_i(2) = wrap_zero_two_pi(h_X_i(2));
-        endif
+        end
         h_X(:,i) = h_X_i;
-        zp += Wm_i * h_X_i;
-    endfor
+        zp = zp + Wm_i * h_X_i;
+    end
     
-    # Normalize angle
+    % Normalize angle
     zp(2) = wrap_minus_plus_pi(zp(2));
     
-    # Compute covariance matrices
+    % Compute covariance matrices
     
     Pxz = zeros(N,M);
     Pzz = zeros(M,M);
@@ -90,11 +90,11 @@ function s_k = ukf_cv_update(t, s_km1, r, theta, proc_vars, meas_vars)
         dz = h_X_i - zp;
         dz(2) = wrap_minus_plus_pi(dz(2));
         
-        Pxz += Wc_i * (dx * dz');
-        Pzz += Wc_i * (dz * dz');
-    endfor
+        Pxz = Pxz + Wc_i * (dx * dz');
+        Pzz = Pzz + Wc_i * (dz * dz');
+    end
     
-    # Correction
+    % Correction
     
     S = Pzz + R;
     K = Pxz * inv(S);
@@ -106,15 +106,18 @@ function s_k = ukf_cv_update(t, s_km1, r, theta, proc_vars, meas_vars)
     x = xp + K * dz;
     P = Pp - K * S * K';
     
+    % Simple hack to maintain symmetry
+    P = 0.5 * (P + P');
+    
     s_k.t = t;
     s_k.x = x;
     s_k.P = P;
     
-    # Carry these forward to the next state update
+    % Carry these forward to the next state update
     s_k.N = N;
     s_k.M = M;
     s_k.sqrt_N_plus_lambda = sqrt_N_plus_lambda;
     s_k.Wm = Wm;
     s_k.Wc = Wc;
     
-endfunction
+end

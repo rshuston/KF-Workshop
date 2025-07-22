@@ -13,4 +13,4 @@ function [t, n, e] = fly_curve
 
     n = pC * cos(phi0 + w * t) + nC;
     e = pC * sin(phi0 + w * t) + eC;
-endfunction
+end

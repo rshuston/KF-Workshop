@@ -16,11 +16,11 @@ function fixed_gain_filters
     for k = 2:length(t)
         x_p = x_hat(k-1);
         x_hat(k) = x_p + alpha * (z(k) - x_p);
-    endfor
+    end
     
-    figure("name", ["Values, alpha = " num2str(alpha)]);
-    plot(t, x, ".", t, z, "o", t, x_hat, "*");
-    set(gca(), "xgrid", "on", "ygrid", "on");
+    figure('name', ['Values, alpha = ', num2str(alpha)]);
+    plot(t, x, '.', t, z, 'o', t, x_hat, '*')
+    grid on
     
     x_hat = zeros(1, length(t));
     v_hat = zeros(1, length(t));
@@ -34,9 +34,9 @@ function fixed_gain_filters
         delta = z(k) - x_p;
         x_hat(k) = x_p + alpha * delta;
         v_hat(k) = v_p + beta * delta / T;
-    endfor
+    end
     
-    figure("name", ["Values, alpha = " num2str(alpha) ", beta = " num2str(beta)]);
-    plot(t, x, ".", t, z, "o", t, x_hat, "*");
-    set(gca(), "xgrid", "on", "ygrid", "on");
-endfunction
+    figure('name', ['Values, alpha = ', num2str(alpha), ', beta = ', num2str(beta)]);
+    plot(t, x, '.', t, z, 'o', t, x_hat, '*')
+    grid on
+end

@@ -1,6 +1,6 @@
-# This version of the UKF implements the classic Julier and Uhlmann algorithm.
-# It uses direction cosine angle measurements so that we can easily handle
-# angles crossing the [-pi, pi) boundary.
+% This version of the UKF implements the classic Julier and Uhlmann algorithm.
+% It uses direction cosine angle measurements so that we can easily handle
+% angles crossing the [-pi, pi) boundary.
 
 function s_k = ukf_ju_cvdc_update(t, s_km1, r, theta, proc_vars, meas_vars)
     
@@ -21,18 +21,16 @@ function s_k = ukf_ju_cvdc_update(t, s_km1, r, theta, proc_vars, meas_vars)
     
     two_N_plus_1 = 2 * N + 1;
     
-    half_pi = pi / 2;
-    
     z = [ r      ;
           cos(theta) ;
           sin(theta) ];
     
-    # Heuristic covariance, but numerically behaved
+    % Heuristic covariance, but numerically behaved
     R = [ var_r , 0      , 0      ;
           0     , var_dc , 0      ;
           0     , 0      , var_dc ];
     
-    # Prediction
+    % Prediction
     
     Phi = [1 , T , 0 , 0;
            0 , 1 , 0 , 0;
@@ -48,7 +46,7 @@ function s_k = ukf_ju_cvdc_update(t, s_km1, r, theta, proc_vars, meas_vars)
           0    , 0    , T4d4 , T3d2 ;
           0    , 0    , T3d2 , T2   ] * var_p;
     
-    # Compute sigma points
+    % Compute sigma points
             
     L = chol(N_plus_kappa * P, "lower");
     
@@ -57,14 +55,14 @@ function s_k = ukf_ju_cvdc_update(t, s_km1, r, theta, proc_vars, meas_vars)
     for i = 2:N+1
         X(:,i)     = x + L(:,i-1);
         X(:,i + N) = x - L(:,i-1);
-    endfor
+    end
     
-    # Compute predicted state and state covariance, saving intermediate results
+    % Compute predicted state and state covariance, saving intermediate results
     
     f_X = zeros(N,two_N_plus_1);
     for j = 1:two_N_plus_1
         f_X(:,j) = Phi * X(:,j);
-    endfor
+    end
     
     xp = zeros(N,1);
     for j = 1:two_N_plus_1
@@ -72,9 +70,9 @@ function s_k = ukf_ju_cvdc_update(t, s_km1, r, theta, proc_vars, meas_vars)
             Wm = W1;
         else
             Wm = Wj;
-        endif
-        xp += Wm * f_X(:,j);
-    endfor
+        end
+        xp = xp + Wm * f_X(:,j);
+    end
     
     Pp = zeros(N,N);
     for j = 1:two_N_plus_1
@@ -82,13 +80,13 @@ function s_k = ukf_ju_cvdc_update(t, s_km1, r, theta, proc_vars, meas_vars)
             Wc = W1;
         else
             Wc = Wj;
-        endif
+        end
         dx = f_X(:,j) - xp;
-        Pp += Wc * (dx * dx');
-    endfor
-    Pp += Q;
+        Pp = Pp + Wc * (dx * dx');
+    end
+    Pp = Pp + Q;
     
-    # Compute predicted measurement, saving intermediate results
+    % Compute predicted measurement, saving intermediate results
     
     zp = zeros(M,1);
     h_X = zeros(M, two_N_plus_1);
@@ -98,23 +96,23 @@ function s_k = ukf_ju_cvdc_update(t, s_km1, r, theta, proc_vars, meas_vars)
             Wm = W1;
         else
             Wm = Wj;
-        endif
+        end
         rho_j = sqrt(f_X_j(1) * f_X_j(1) + f_X_j(3) * f_X_j(3));
         h_X_j = [ rho_j          ;
                   f_X_j(1) / rho_j ;
                   f_X_j(3) / rho_j ];
         h_X(:,j) = h_X_j;
-        zp += Wm * h_X_j;
-    endfor
+        zp = zp + Wm * h_X_j;
+    end
     
-    # Normalize mean direction cosines adjusted from weighting
+    % Normalize mean direction cosines adjusted from weighting
     c = zp(2);
     s = zp(3);
     d = sqrt(c * c + s * s);
     zp(2) = c / d;
     zp(3) = s / d;
     
-    # Compute covariance matrices
+    % Compute covariance matrices
     
     Pzz = zeros(M,M);
     Pxz = zeros(N,M);
@@ -125,16 +123,16 @@ function s_k = ukf_ju_cvdc_update(t, s_km1, r, theta, proc_vars, meas_vars)
             Wc = W1;
         else
             Wc = Wj;
-        endif
+        end
 
         dz = h_X_j - zp;
         dx = f_X_j - xp;
         
-        Pzz += Wc * (dz * dz');
-        Pxz += Wc * (dx * dz');
-    endfor
+        Pzz = Pzz + Wc * (dz * dz');
+        Pxz = Pxz + Wc * (dx * dz');
+    end
     
-    # Correction
+    % Correction
     
     S = Pzz + R;
     K = Pxz * inv(S);
@@ -143,16 +141,19 @@ function s_k = ukf_ju_cvdc_update(t, s_km1, r, theta, proc_vars, meas_vars)
     
     x = xp + K * dz;
     P = Pp - K * S * K';
+
+    % Simple hack to maintain symmetry
+    P = 0.5 * (P + P');
     
     s_k.t = t;
     s_k.x = x;
     s_k.P = P;
     
-    # Carry these forward to the next state update
+    % Carry these forward to the next state update
     s_k.N = N;
     s_k.M = M;
     s_k.N_plus_kappa = N_plus_kappa;
     s_k.W1 = W1;
     s_k.Wj = Wj;
     
-endfunction
+end

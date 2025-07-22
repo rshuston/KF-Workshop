@@ -20,4 +20,4 @@ function [t, n, e] = fly_s_curve
     t = [t1, t2];
     n = [n1, n2];
     e = [e1, e2];
-endfunction
+end

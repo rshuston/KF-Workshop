@@ -31,4 +31,4 @@ function [t, n, e] = fly_square
     n = [nt, nr, nb, nl];
     e = [et, er, eb, el];
     t = [ts, ts + 25, ts + 50, ts + 75];
-endfunction
+end

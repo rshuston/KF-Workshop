@@ -9,4 +9,4 @@ function [t, n, e] = fly_line
 
     n = n0 + vn * t;
     e = e0 + ve * t;
-endfunction
+end

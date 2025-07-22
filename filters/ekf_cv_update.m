@@ -1,5 +1,5 @@
-# This version of the EKF manually accounts for angles crossing the
-# [-pi, pi) boundary.
+% This version of the EKF manually accounts for angles crossing the
+% [-pi, pi) boundary.
 
 function s_k = ekf_cv_update(t, s_km1, r, theta, proc_vars, meas_vars)
     
@@ -12,7 +12,7 @@ function s_k = ekf_cv_update(t, s_km1, r, theta, proc_vars, meas_vars)
     x = s_km1.x;
     P = s_km1.P;
     
-    # Prediction
+    % Prediction
     
     Phi = [1 , T , 0 , 0;
            0 , 1 , 0 , 0;
@@ -51,9 +51,12 @@ function s_k = ekf_cv_update(t, s_km1, r, theta, proc_vars, meas_vars)
     
     x = xp + K * dz;
     P = Pp - K * S * K';
+
+    % Simple hack to maintain symmetry
+    P = 0.5 * (P + P');
     
     s_k.t = t;
     s_k.x = x;
     s_k.P = P;
     
-endfunction
+end

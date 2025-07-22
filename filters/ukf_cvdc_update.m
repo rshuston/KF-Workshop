@@ -1,7 +1,7 @@
-# This version of the UKF only approximates the measurement relation, and uses
-# different weights for mean (Wm) and covariance (Wc) sums. It uses direction
-# cosine angle measurements so that we can easily handle angles crossing the
-# [-pi, pi) boundary.
+% This version of the UKF only approximates the measurement relation, and uses
+% different weights for mean (Wm) and covariance (Wc) sums. It uses direction
+% cosine angle measurements so that we can easily handle angles crossing the
+% [-pi, pi) boundary.
 
 function s_k = ukf_cvdc_update(t, s_km1, r, theta, proc_vars, meas_vars)
     
@@ -28,12 +28,12 @@ function s_k = ukf_cvdc_update(t, s_km1, r, theta, proc_vars, meas_vars)
           cos(theta) ;
           sin(theta) ];
     
-    # Heuristic covariance, but numerically behaved
+    % Heuristic covariance, but numerically behaved
     R = [ var_r , 0      , 0      ;
           0     , var_dc , 0      ;
           0     , 0      , var_dc ];
     
-    # Prediction
+    % Prediction
     
     Phi = [1 , T , 0 , 0;
            0 , 1 , 0 , 0;
@@ -52,7 +52,7 @@ function s_k = ukf_cvdc_update(t, s_km1, r, theta, proc_vars, meas_vars)
     xp = Phi * x;
     Pp = Phi * P * Phi' + Q;
     
-    # Compute sigma points and weights
+    % Compute sigma points and weights
     
     L = sqrt_N_plus_lambda * chol(Pp, "lower");
     
@@ -61,9 +61,9 @@ function s_k = ukf_cvdc_update(t, s_km1, r, theta, proc_vars, meas_vars)
     for i = 2:N+1
         X(:,i) = xp + L(:,i-1);
         X(:,i + N) = xp - L(:,i-1);
-    endfor
+    end
     
-    # Compute predicted measurement, saving intermediate results
+    % Compute predicted measurement, saving intermediate results
     
     zp = zeros(M,1);
     h_X = zeros(M, two_N_plus_1);
@@ -75,17 +75,17 @@ function s_k = ukf_cvdc_update(t, s_km1, r, theta, proc_vars, meas_vars)
                   X_i(1) / rho_i ;
                   X_i(3) / rho_i ];
         h_X(:,i) = h_X_i;
-        zp += Wm_i * h_X_i;
-    endfor
+        zp = zp + Wm_i * h_X_i;
+    end
     
-    # Normalize direction cosines adjusted from weighting
+    % Normalize direction cosines adjusted from weighting
     c = zp(2);
     s = zp(3);
     d = sqrt(c * c + s * s);
     zp(2) = c / d;
     zp(3) = s / d;
     
-    # Compute covariance matrices
+    % Compute covariance matrices
     
     Pxz = zeros(N,M);
     Pzz = zeros(M,M);
@@ -97,11 +97,11 @@ function s_k = ukf_cvdc_update(t, s_km1, r, theta, proc_vars, meas_vars)
         dx = X_i - xp;
         dz = h_X_i - zp;
         
-        Pxz += Wc_i * (dx * dz');
-        Pzz += Wc_i * (dz * dz');
-    endfor
+        Pxz = Pxz + Wc_i * (dx * dz');
+        Pzz = Pzz + Wc_i * (dz * dz');
+    end
     
-    # Correction
+    % Correction
     
     S = Pzz + R;
     K = Pxz * inv(S);
@@ -115,11 +115,11 @@ function s_k = ukf_cvdc_update(t, s_km1, r, theta, proc_vars, meas_vars)
     s_k.x = x;
     s_k.P = P;
     
-    # Carry these forward to the next state update
+    % Carry these forward to the next state update
     s_k.N = N;
     s_k.M = M;
     s_k.sqrt_N_plus_lambda = sqrt_N_plus_lambda;
     s_k.Wm = Wm;
     s_k.Wc = Wc;
     
-endfunction
+end

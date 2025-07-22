@@ -1,6 +1,6 @@
-# This version of the UKF implements the classic Julier and Uhlmann algorithm.
-# It uses direction cosine angle measurements so that we can easily handle
-# angles crossing the [-pi, pi) boundary.
+% This version of the UKF implements the classic Julier and Uhlmann algorithm.
+% It uses direction cosine angle measurements so that we can easily handle
+% angles crossing the [-pi, pi) boundary.
 
 function s_k = ukf_ju_cvdc_init(t, r, theta, vars)
     
@@ -20,8 +20,8 @@ function s_k = ukf_ju_cvdc_init(t, r, theta, vars)
     s_k.x = [n; vn; e; ve];
     s_k.P = P0;
     
-    N = 4; # states
-    M = 3; # measurements
+    N = 4; % states
+    M = 3; % measurements
     N_plus_kappa = 3;
     kappa = N_plus_kappa - N;
     W1 = kappa / N_plus_kappa;
@@ -33,4 +33,4 @@ function s_k = ukf_ju_cvdc_init(t, r, theta, vars)
     s_k.W1 = W1;
     s_k.Wj = Wj;
     
-endfunction
+end

@@ -1,12 +1,12 @@
-# This EKF implements the "constant turn" target model with acceleration
-# disturbances.
-# This version of the EKF manually accounts for angles crossing the
-# [-pi, pi) boundary.
+% This EKF implements the "constant turn" target model with acceleration
+% disturbances.
+% This version of the EKF manually accounts for angles crossing the
+% [-pi, pi) boundary.
 
 function s_k = ekf_ct_update(t, s_km1, r, theta, proc_vars, meas_vars)
     
-    var_a = proc_vars(1);       # cartesian acceleration disturbance
-    var_alpha = proc_vars(2);   # angular acceleration disturbance
+    var_a = proc_vars(1);       % cartesian acceleration disturbance
+    var_alpha = proc_vars(2);   % angular acceleration disturbance
     var_r = meas_vars(1);
     var_theta = meas_vars(2);
     
@@ -23,7 +23,7 @@ function s_k = ekf_ct_update(t, s_km1, r, theta, proc_vars, meas_vars)
     R = [ var_r , 0         ;
           0     , var_theta ];
     
-    # Prediction
+    % Prediction
     
     w = x(5);
     if (w == 0)
@@ -48,7 +48,7 @@ function s_k = ekf_ct_update(t, s_km1, r, theta, proc_vars, meas_vars)
         dvndw = -vn * T * sin_wT - ve * T * cos_wT;
         dedw = vn * temp2 + ve * temp1;
         dvedw = vn * T * cos_wT - ve * T * sin_wT;
-    endif
+    end
     
     Phi = [1 , sin_wT_div_w ,       0 , -one_m_cos_wT_div_w , 0;
            0 , cos_wT ,             0 , -sin_wT ,             0;
@@ -88,9 +88,12 @@ function s_k = ekf_ct_update(t, s_km1, r, theta, proc_vars, meas_vars)
     
     x = xp + K * dz;
     P = Pp - K * S * K';
+
+    % Simple hack to maintain symmetry
+    P = 0.5 * (P + P');
     
     s_k.t = t;
     s_k.x = x;
     s_k.P = P;
     
-endfunction
+end

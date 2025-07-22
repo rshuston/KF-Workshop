@@ -17,4 +17,4 @@ function [t, n, e] = fly_wiggle
 
     n = n0 + vn * t + nw * cos(phi0_n + w * t);
     e = e0 + ve * t + ew * cos(phi0_e + w * t);
-endfunction
+end

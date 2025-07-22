@@ -1,6 +1,6 @@
-# This version of the UKF only approximates the measurement relation, and uses
-# different weights for mean (Wm) and covariance (Wc) sums. It also manually
-# accounts for angles crossing the [-pi, pi) boundary.
+% This version of the UKF only approximates the measurement relation, and uses
+% different weights for mean (Wm) and covariance (Wc) sums. It also manually
+% accounts for angles crossing the [-pi, pi) boundary.
 
 function s_k = ukf_cv_init(t, r, theta, vars)
     
@@ -20,8 +20,8 @@ function s_k = ukf_cv_init(t, r, theta, vars)
     s_k.x = [n; vn; e; ve];
     s_k.P = P0;
     
-    N = 4; # states
-    M = 2; # measurements
+    N = 4; % states
+    M = 2; % measurements
     two_N_plus_1 = 2 * N + 1;
     alpha = 0.5;
     beta = 2;
@@ -39,7 +39,7 @@ function s_k = ukf_cv_init(t, r, theta, vars)
     for i = 2:two_N_plus_1
         Wm(i) = Wi;
         Wc(i) = Wi;
-    endfor
+    end
     
     s_k.N = N;
     s_k.M = M;
@@ -47,4 +47,4 @@ function s_k = ukf_cv_init(t, r, theta, vars)
     s_k.Wm = Wm;
     s_k.Wc = Wc;
     
-endfunction
+end

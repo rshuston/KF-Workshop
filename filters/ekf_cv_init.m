@@ -1,5 +1,5 @@
-# This version of the EKF manually accounts for angles crossing the
-# [-pi, pi) boundary.
+% This version of the EKF manually accounts for angles crossing the
+% [-pi, pi) boundary.
 
 function s_k = ekf_cv_init(t, r, theta, vars)
     
@@ -19,4 +19,4 @@ function s_k = ekf_cv_init(t, r, theta, vars)
     s_k.x = [n; vn; e; ve];
     s_k.P = P0;
     
-endfunction
+end

@@ -27,4 +27,4 @@ function [t, n, e] = fly_figure_8
     t = [t1, t2, t3];
     n = [n1, n2, n3];
     e = [e1, e2, e3];
-endfunction
+end

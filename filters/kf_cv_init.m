@@ -1,4 +1,4 @@
-# Standard linear Kalman filter ... nothing fancy
+% Standard linear Kalman filter ... nothing fancy
 
 function s_k = kf_cv_init(t, r, theta, vars)
     
@@ -18,4 +18,4 @@ function s_k = kf_cv_init(t, r, theta, vars)
     s_k.x = [n; vn; e; ve];
     s_k.P = P0;
     
-endfunction
+end
