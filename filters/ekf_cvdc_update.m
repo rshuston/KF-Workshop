@@ -38,7 +38,8 @@ function s_k = ekf_cvdc_update(t, s_km1, r, theta, proc_vars, meas_vars)
           0    , 0    , T3d2 , T2   ] * var_p;
     
     xp = Phi * x;
-    Pp = Phi * P * Phi' + Q;
+    % Pp = Phi * P * Phi' + Q;
+    Pp = quad_mult(Phi, P) + Q;
     
     rp = sqrt(xp(1) * xp(1) + xp(3) * xp(3));
     
@@ -60,14 +61,14 @@ function s_k = ekf_cvdc_update(t, s_km1, r, theta, proc_vars, meas_vars)
           xp(3) * xp(3) / rp3   , 0 , - xp(1) * xp(3) / rp3 , 0 ;
           - xp(1) * xp(3) / rp3 , 0 , xp(1) * xp(1) / rp3   , 0 ];
     
-    S = H * Pp * H' + R;
-    K = Pp * H' * inv(S);
+    % S = H * Pp * H' + R;
+    S = quad_mult(H, Pp) + R;
+    % K = Pp * H' * inv(S);
+    K = Pp * H' * inv_sym_3x3(S);
     
     x = xp + K * dz;
-    P = Pp - K * S * K';
-
-    % Simple hack to maintain symmetry
-    P = 0.5 * (P + P');
+    % P = Pp - K * S * K';
+    P = Pp - quad_mult(K, S);
     
     s_k.t = t;
     s_k.x = x;

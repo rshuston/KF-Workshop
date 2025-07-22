@@ -22,8 +22,6 @@ function s_k = ukf_cvdc_update(t, s_km1, r, theta, proc_vars, meas_vars)
     
     two_N_plus_1 = 2 * N + 1;
     
-    half_pi = pi / 2;
-    
     z = [ r      ;
           cos(theta) ;
           sin(theta) ];
@@ -50,7 +48,8 @@ function s_k = ukf_cvdc_update(t, s_km1, r, theta, proc_vars, meas_vars)
           0    , 0    , T3d2 , T2   ] * var_p;
     
     xp = Phi * x;
-    Pp = Phi * P * Phi' + Q;
+    % Pp = Phi * P * Phi' + Q;
+    Pp = quad_mult(Phi, P) + Q;
     
     % Compute sigma points and weights
     
@@ -104,12 +103,14 @@ function s_k = ukf_cvdc_update(t, s_km1, r, theta, proc_vars, meas_vars)
     % Correction
     
     S = Pzz + R;
-    K = Pxz * inv(S);
+    % K = Pxz * inv(S);
+    K = Pxz * inv_sym_3x3(S);
     
     dz = z - zp;
     
     x = xp + K * dz;
-    P = Pp - K * S * K';
+    % P = Pp - K * S * K';
+    P = Pp - quad_mult(K, S);
     
     s_k.t = t;
     s_k.x = x;

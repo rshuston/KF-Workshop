@@ -135,15 +135,14 @@ function s_k = ukf_ju_cvdc_update(t, s_km1, r, theta, proc_vars, meas_vars)
     % Correction
     
     S = Pzz + R;
-    K = Pxz * inv(S);
+    % K = Pxz * inv(S);
+    K = Pxz * inv_sym_3x3(S);
     
     dz = z - zp;
     
     x = xp + K * dz;
-    P = Pp - K * S * K';
-
-    % Simple hack to maintain symmetry
-    P = 0.5 * (P + P');
+    % P = Pp - K * S * K';
+    P = Pp - quad_mult(K, S);
     
     s_k.t = t;
     s_k.x = x;

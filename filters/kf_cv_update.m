@@ -28,7 +28,8 @@ function s_k = kf_cv_update(t, s_km1, r, theta, proc_vars, meas_vars)
           0    , 0    , T3d2 , T2   ] * var_p;
     
     xp = Phi * x;
-    Pp = Phi * P * Phi' + Q;
+    % Pp = Phi * P * Phi' + Q;
+    Pp = quad_mult(Phi, P) + Q;
     
     cos_theta = cos(theta);
     sin_theta = sin(theta);
@@ -45,19 +46,20 @@ function s_k = kf_cv_update(t, s_km1, r, theta, proc_vars, meas_vars)
     R = [ var_r , 0         ;
           0     , var_theta ];
     
-    Rz = M * R * M';
+    % Rz = M * R * M';
+    Rz = quad_mult(M, R);
     
     H = [ 1 , 0 , 0 , 0 ;
           0 , 0 , 1 , 0 ];
     
-    S = H * Pp * H' + Rz;
-    K = Pp * H' * inv(S);
+    % S = H * Pp * H' + Rz;
+    S = quad_mult(H, Pp) + Rz;
+    % K = Pp * H' * inv(S);
+    K = Pp * H' * inv_sym_2x2(S);
     
     x = xp + K * dz;
-    P = Pp - K * S * K';
-
-    % Simple hack to maintain symmetry
-    P = 0.5 * (P + P');
+    % P = Pp - K * S * K';
+    P = Pp - quad_mult(K, S);
     
     s_k.t = t;
     s_k.x = x;
