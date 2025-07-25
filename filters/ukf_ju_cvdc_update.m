@@ -48,7 +48,7 @@ function s_k = ukf_ju_cvdc_update(t, s_km1, r, theta, proc_vars, meas_vars)
     
     % Compute sigma points
             
-    L = chol(N_plus_kappa * P, "lower");
+    L = chol(N_plus_kappa * P, 'lower');
     
     X = zeros(N, two_N_plus_1);
     X(:,1) = x;

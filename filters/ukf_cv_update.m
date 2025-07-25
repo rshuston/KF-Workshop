@@ -48,7 +48,7 @@ function s_k = ukf_cv_update(t, s_km1, r, theta, proc_vars, meas_vars)
     
     % Compute sigma points and weights
     
-    L = sqrt_N_plus_lambda * chol(Pp, "lower");
+    L = sqrt_N_plus_lambda * chol(Pp, 'lower');
     
     X = zeros(N, two_N_plus_1);
     X(:,1) = xp;
