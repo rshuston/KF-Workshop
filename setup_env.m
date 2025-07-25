@@ -1,3 +1,5 @@
 function setup_env
-    addpath('filters:scenarios:toolbox');
+    addpath('filters')
+    addpath('scenarios')
+    addpath('toolbox')
 end

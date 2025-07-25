@@ -25,7 +25,7 @@ function fly(scenario)
             case 'wiggle'
                 [t, n, e] = fly_wiggle;
             otherwise
-                fprintf('Unknown scenario: %s\n', scenario);
+                fprintf('Unknown scenario: %s\n', scenario)
                 return;
         end
     else
@@ -137,31 +137,30 @@ function plot_results(label, t, n, e, r, theta, nz, ez, rz, thetaz, nf, vnf, ef,
     figure('name', ['Parametric - ', label]);
     plot(ez, nz, '.', ef, nf, '*', e, n, 'o')
     axis([-50, 50, -50, 50], 'square')
-    xticks(-50:10:50)
-    yticks(-50:10:50)
+    set(gca, 'XTick', -50:10:50)
+    set(gca, 'YTick', -50:10:50)
     grid on
     
     figure('name', ['Components - ' label]);
-    tiledlayout(2,2)
-
-    ax1 = nexttile;
-    plot(ax1, t, vnf, '.-');
-    grid on
-    title(ax1, 'vn');
     
-    ax2 = nexttile;
-    plot(ax2, t, vef, '.-');
+    subplot(2,2,1)
+    plot(t, vnf, '.-')
     grid on
-    title(ax2, 've');
+    title('vn')
     
-    ax3 = nexttile;
-    plot(ax3, t, rz, '.', t, rf, '*', t, r, 'o');
+    subplot(2,2,2)
+    plot(t, vef, '.-')
     grid on
-    title(ax3, 'Range');
+    title('ve')
     
-    ax4 = nexttile;
-    plot(ax4, t, thetaz, '.', t, thetaf, '*', t, theta, 'o');
+    subplot(2,2,3)
+    plot(t, rz, '.', t, rf, '*', t, r, 'o')
     grid on
-    title(ax4, 'Angle');
+    title('Range')
+    
+    subplot(2,2,4)
+    plot(t, thetaz, '.', t, thetaf, '*', t, theta, 'o')
+    grid on
+    title('Angle')
     
 end
