@@ -134,6 +134,17 @@ function plot_results(label, t, n, e, r, theta, nz, ez, rz, thetaz, nf, vnf, ef,
     rf = sqrt(nf .* nf + ef .* ef);
     thetaf = atan2(ef, nf);
     
+    var_n = zeros(1, length(t));
+    var_vn = zeros(1, length(t));
+    var_e = zeros(1, length(t));
+    var_ve = zeros(1, length(t));
+    for k = 2:length(t)
+        var_n(k) = Pnef{k}(1,1);
+        var_vn(k) = Pnef{k}(2,2);
+        var_e(k) = Pnef{k}(3,3);
+        var_ve(k) = Pnef{k}(4,4);
+    end
+    
     figure('name', ['Parametric - ', label]);
     plot(ez, nz, '.', ef, nf, '*', e, n, 'o')
     axis([-50, 50, -50, 50], 'square')
@@ -146,12 +157,12 @@ function plot_results(label, t, n, e, r, theta, nz, ez, rz, thetaz, nf, vnf, ef,
     subplot(2,2,1)
     plot(t, vnf, '.-')
     grid on
-    title('vn')
+    title('v_n')
     
     subplot(2,2,2)
     plot(t, vef, '.-')
     grid on
-    title('ve')
+    title('v_e')
     
     subplot(2,2,3)
     plot(t, rz, '.', t, rf, '*', t, r, 'o')
@@ -162,5 +173,27 @@ function plot_results(label, t, n, e, r, theta, nz, ez, rz, thetaz, nf, vnf, ef,
     plot(t, thetaz, '.', t, thetaf, '*', t, theta, 'o')
     grid on
     title('Angle')
+    
+    figure('name', ['Covariances - ' label]);
+    
+    subplot(2,2,1)
+    plot(t, var_n, '.-')
+    grid on
+    title('var_n')
+    
+    subplot(2,2,2)
+    plot(t, var_e, '.-')
+    grid on
+    title('var_e')
+    
+    subplot(2,2,3)
+    plot(t, var_vn, '.-')
+    grid on
+    title('var_{vn}')
+    
+    subplot(2,2,4)
+    plot(t, var_ve, '.-')
+    grid on
+    title('var_{ve}')
     
 end
