@@ -18,7 +18,7 @@ function [t, n, e] = fly_figure_8
     e2 = pC * sin(phi0 + w * (t2 - tmax/4)) + eC;
 
     t3 = [3*tmax/4 : 1 : tmax];
-    phi0 = -pi();
+    phi0 = -pi;
     w = -w;
     nC = 25;
     n3 = pC * cos(phi0 + w * (t3 - 3*tmax/4)) + nC;
