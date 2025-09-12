@@ -138,7 +138,7 @@ function plot_results(label, t, n, e, r, theta, nz, ez, rz, thetaz, nf, vnf, ef,
     var_vn = zeros(1, length(t));
     var_e = zeros(1, length(t));
     var_ve = zeros(1, length(t));
-    for k = 2:length(t)
+    for k = 1:length(t)
         var_n(k) = Pnef{k}(1,1);
         var_vn(k) = Pnef{k}(2,2);
         var_e(k) = Pnef{k}(3,3);

@@ -1,17 +1,21 @@
-function inv_M = inv_sym_2x2(M)
+%
+% Inversion of symmetric 2x2 matrix
+%
+
+function inv_A = inv_sym_2x2(A)
     
-    % M =
-    %    m11 m12
-    %    m12 m22
+    % A =
+    %    a11 a12
+    %    a12 a22
     
-    m11 = M(1,1);
-    m12 = M(1,2);
+    a11 = A(1,1);
+    a12 = A(1,2);
     
-    m22 = M(2,2);
+    a22 = A(2,2);
     
-    D = m11 * m22 - m12 * m12;
+    D = a11 * a22 - a12 * a12;
     
-    inv_M = (1 / D) * [  m22 -m12 ;
-                        -m12  m11 ];
+    inv_A = (1 / D) * [  a22 -a12 ;
+                        -a12  a11 ];
     
 end
