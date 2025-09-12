@@ -16,11 +16,12 @@ Two model types are explored:
 
 Six flight scenarios are simulated:
 1. circle
-2. curve
-3. line
-4. s-curve
-5. square
-6. wiggle
+1. curve
+1. figure-8
+1. line
+1. s-curve
+1. square
+1. wiggle
 
 Run the "setup_env" script in Octave to add the necessary subdirectories to
 the function search path.
