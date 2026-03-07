@@ -1,4 +1,5 @@
 using Plots
+using Printf
 
 t_max = 100
 w = 2 * π / t_max
@@ -22,7 +23,7 @@ for k in 2:N
 end
 p_alpha = plot(t, [x z x_hat],
     seriestype = :scatter, markersize=2,
-    title = "Values, alpha = $alpha")
+    title = "alpha = $(@sprintf("%.2f", alpha))")
 
 x_hat = zeros(N)
 v_hat = zeros(N)
@@ -38,7 +39,7 @@ for k in 2:N
 end
 p_alpha_beta = plot(t, [x z x_hat],
     seriestype=:scatter, markersize=2,
-    title="Values, alpha = $alpha, beta = $beta")
+    title="alpha = $(@sprintf("%.2f", alpha)), beta = $(@sprintf("%.3f", beta))")
 
 plot(p_alpha, p_alpha_beta,
     layout = (2,1),
