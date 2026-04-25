@@ -3,12 +3,14 @@
 A MATLAB workspace to explore various Kalman filtering techniques.
 
 The following filter types are explored:
-- Kalman Filter, Transformed Range and Bearing Measurements
-- Extended Kalman Filter, Range and Bearing Measurements
-- Extended Kalman Filter, Range and Direction Cosine Measurements
-- Unscented Kalman Filter (measurement relation only), Range and Bearing Measurements
-- Unscented Kalman Filter (measurement relation ony), Range and Direction Cosine Measurements
-- Unscented Kalman Filter (classic Julier and Uhlmann algorithm), Range and Direction Cosine Measurements
+- Linear Kalman filter, Transformed Range and Bearing Measurements
+- Extended Kalman filter, Range and Bearing Measurements
+- Extended Kalman filter, Range and Direction Cosine Measurements
+- Extended Kalman filter, Range, Range Rate, and Bearing Measurements
+- Extended Kalman filter, Range, Range Rate, and Direction Cosine Measurements
+- Unscented Kalman filter (measurement relation only), Range and Bearing Measurements
+- Unscented Kalman filter (measurement relation ony), Range and Direction Cosine Measurements
+- Unscented Kalman filter (classic Julier and Uhlmann algorithm), Range and Direction Cosine Measurements
 
 Two model types are explored:
 - Constant velocity with acceleration disturbances

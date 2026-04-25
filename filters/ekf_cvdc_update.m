@@ -1,7 +1,9 @@
 % This version of the EKF uses direction cosine angle measurements so that we
 % can easily handle angles crossing the [-pi, pi) boundary.
+%
+% Note: vr is not used by this filter
 
-function s_k = ekf_cvdc_update(t, s_km1, r, theta, proc_vars, meas_vars)
+function s_k = ekf_cvdc_update(t, s_km1, r, theta, vr, proc_vars, meas_vars)
     
     var_p = proc_vars(1);
     var_r = meas_vars(1);
@@ -12,7 +14,7 @@ function s_k = ekf_cvdc_update(t, s_km1, r, theta, proc_vars, meas_vars)
     x = s_km1.x;
     P = s_km1.P;
     
-    z = [ r      ;
+    z = [ r          ;
           cos(theta) ;
           sin(theta) ];
     

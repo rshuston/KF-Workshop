@@ -2,8 +2,10 @@
 % different weights for mean (Wm) and covariance (Wc) sums. It uses direction
 % cosine angle measurements so that we can easily handle angles crossing the
 % [-pi, pi) boundary.
+%
+% Note: vr is not used by this filter
 
-function s_k = ukf_cvdc_init(t, r, theta, vars)
+function s_k = ukf_cvdc_init(t, r, theta, vr, vars)
     
     n = r * cos(theta);
     vn = 0;

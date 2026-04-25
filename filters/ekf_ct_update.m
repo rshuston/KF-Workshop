@@ -2,8 +2,10 @@
 % disturbances.
 % This version of the EKF manually accounts for angles crossing the
 % [-pi, pi) boundary.
+%
+% Note: vr is not used by this filter
 
-function s_k = ekf_ct_update(t, s_km1, r, theta, proc_vars, meas_vars)
+function s_k = ekf_ct_update(t, s_km1, r, theta, vr, proc_vars, meas_vars)
     
     var_a = proc_vars(1);       % cartesian acceleration disturbance
     var_alpha = proc_vars(2);   % angular acceleration disturbance

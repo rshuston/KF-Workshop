@@ -1,8 +1,10 @@
 % This version of the UKF implements the classic Julier and Uhlmann algorithm.
 % It uses direction cosine angle measurements so that we can easily handle
 % angles crossing the [-pi, pi) boundary.
+%
+% Note: vr is not used by this filter
 
-function s_k = ukf_ju_cvdc_init(t, r, theta, vars)
+function s_k = ukf_ju_cvdc_init(t, r, theta, vr, vars)
     
     n = r * cos(theta);
     vn = 0;

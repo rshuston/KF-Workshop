@@ -1,5 +1,7 @@
-function [t, n, e] = fly_square
-    ts = [0 : 1 : 24];
+function [t, n, e, vn, ve] = fly_square
+    tstep = 1;
+
+    ts = [0 : tstep : 24];
 
     dt = ts(length(ts)) - ts(1);
 
@@ -31,4 +33,7 @@ function [t, n, e] = fly_square
     n = [nt, nr, nb, nl];
     e = [et, er, eb, el];
     t = [ts, ts + 25, ts + 50, ts + 75];
+
+    vn = gradient(n, tstep);
+    ve = gradient(e, tstep);
 end

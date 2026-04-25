@@ -1,8 +1,10 @@
 % This version of the UKF only approximates the measurement relation, and uses
 % different weights for mean (Wm) and covariance (Wc) sums. It also manually
 % accounts for angles crossing the [-pi, pi) boundary.
+%
+% Note: vr is not used by this filter
 
-function s_k = ukf_cv_update(t, s_km1, r, theta, proc_vars, meas_vars)
+function s_k = ukf_cv_update(t, s_km1, r, theta, vr, proc_vars, meas_vars)
     
     var_p = proc_vars(1);
     var_r = meas_vars(1);

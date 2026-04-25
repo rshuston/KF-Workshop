@@ -1,6 +1,8 @@
 % Standard linear Kalman filter ... nothing fancy
+%
+% Note: vr is not used by this filter
 
-function s_k = kf_cv_init(t, r, theta, vars)
+function s_k = kf_cv_init(t, r, theta, vr, vars)
     
     n = r * cos(theta);
     vn = 0;

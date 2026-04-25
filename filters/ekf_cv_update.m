@@ -1,7 +1,9 @@
 % This version of the EKF manually accounts for angles crossing the
 % [-pi, pi) boundary.
+%
+% Note: vr is not used by this filter
 
-function s_k = ekf_cv_update(t, s_km1, r, theta, proc_vars, meas_vars)
+function s_k = ekf_cv_update(t, s_km1, r, theta, vr, proc_vars, meas_vars)
     
     var_p = proc_vars(1);
     var_r = meas_vars(1);

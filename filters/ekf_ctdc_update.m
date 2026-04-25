@@ -2,8 +2,10 @@
 % disturbances.
 % This version of the EKF uses direction cosine angle measurements so that we
 % can easily handle angles crossing the [-pi, pi) boundary.
+%
+% Note: vr is not used by this filter
 
-function s_k = ekf_ctdc_update(t, s_km1, r, theta, proc_vars, meas_vars)
+function s_k = ekf_ctdc_update(t, s_km1, r, theta, vr, proc_vars, meas_vars)
     
     var_a = proc_vars(1);       % cartesian acceleration disturbance
     var_alpha = proc_vars(2);   % angular acceleration disturbance
@@ -20,7 +22,7 @@ function s_k = ekf_ctdc_update(t, s_km1, r, theta, proc_vars, meas_vars)
          0 ,     var_a , 0;
          0 ,     0 ,     var_alpha];
     
-    z = [ r      ;
+    z = [ r          ;
           cos(theta) ;
           sin(theta) ];
     
@@ -83,7 +85,7 @@ function s_k = ekf_ctdc_update(t, s_km1, r, theta, proc_vars, meas_vars)
     zp = [ rp         ;
            xp(1) / rp ;
            xp(3) / rp ];
-           
+    
     % Normalize direction cosines adjusted from roundoff
     c = zp(2);
     s = zp(3);

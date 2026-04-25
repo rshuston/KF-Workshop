@@ -2,8 +2,10 @@
 % disturbances.
 % This version of the EKF manually accounts for angles crossing the
 % [-pi, pi) boundary.
+%
+% Note: vr is not used by this filter
 
-function s_k = ekf_ct_init(t, r, theta, vars)
+function s_k = ekf_ct_init(t, r, theta, vr, vars)
     
     n = r * cos(theta);
     vn = 0;
