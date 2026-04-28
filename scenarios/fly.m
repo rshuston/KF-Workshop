@@ -235,7 +235,7 @@ function plot_results(label, t, n, e, r, theta, vn, ve, vr,...
 
     figure('name', ['Parametric - ', label]);
 
-    plot(e, n, 'k.', ez, nz, 'r.', ef, nf, 'b.')
+    plot(e, n, 'k-', ez, nz, 'r.', ef, nf, 'b-')
     axis([-50, 50, -50, 50], 'square')
     xticks([-50:10:50])
     yticks([-50:10:50])
@@ -245,28 +245,28 @@ function plot_results(label, t, n, e, r, theta, vn, ve, vr,...
     figure('name', ['State Components - ' label]);
 
     subplot(2,2,1)
-    plot(t, n, 'k.',t, nz, 'r.',t, nf, 'b.')
+    plot(t, n, 'k-',t, nz, 'r.',t, nf, 'b-')
     ylim(marginize_axis_limits(ylim, 1.0));
     legend('true', 'measured', 'filtered', 'Location', 'Best')
     grid on
     title('n')
 
     subplot(2,2,2)
-    plot(t, e, 'k.',t, ez, 'r.',t, ef, 'b.')
+    plot(t, e, 'k-',t, ez, 'r.',t, ef, 'b-')
     ylim(marginize_axis_limits(ylim, 1.0));
     legend('true', 'measured', 'filtered', 'Location', 'Best')
     grid on
     title('e')
 
     subplot(2,2,3)
-    plot(t, vn, 'k.', t, vnf, 'b.')
+    plot(t, vn, 'k-', t, vnf, 'b-')
     ylim(marginize_axis_limits(ylim, 1.0));
     legend('true', 'filtered', 'Location', 'Best')
     grid on
     title('v_n')
 
     subplot(2,2,4)
-    plot(t, ve, 'k.', t, vef, 'b.')
+    plot(t, ve, 'k-', t, vef, 'b-')
     ylim(marginize_axis_limits(ylim, 1.0));
     legend('true', 'filtered', 'Location', 'Best')
     grid on
@@ -275,25 +275,25 @@ function plot_results(label, t, n, e, r, theta, vn, ve, vr,...
     figure('name', ['State Covariances - ' label]);
 
     subplot(2,2,1)
-    plot(t, var_n, 'b.')
+    plot(t, var_n, 'b-')
     ylim(marginize_axis_limits(ylim, 1.0));
     grid on
     title('var_n')
 
     subplot(2,2,2)
-    plot(t, var_e, 'b.')
+    plot(t, var_e, 'b-')
     ylim(marginize_axis_limits(ylim, 1.0));
     grid on
     title('var_e')
 
     subplot(2,2,3)
-    plot(t, var_vn, 'b.')
+    plot(t, var_vn, 'b-')
     ylim(marginize_axis_limits(ylim, 1.0));
     grid on
     title('var_{vn}')
 
     subplot(2,2,4)
-    plot(t, var_ve, 'b.')
+    plot(t, var_ve, 'b-')
     ylim(marginize_axis_limits(ylim, 1.0));
     grid on
     title('var_{ve}')
@@ -301,42 +301,42 @@ function plot_results(label, t, n, e, r, theta, vn, ve, vr,...
     figure('name', ['Polar Components - ' label]);
 
     subplot(3,2,1)
-    plot(t, n, 'k.',t, nz, 'r.',t, nf, 'b.')
+    plot(t, n, 'k-',t, nz, 'r.',t, nf, 'b-')
     ylim(marginize_axis_limits(ylim, 1.0));
     legend('true', 'measured', 'filtered', 'Location', 'Best')
     grid on
     title('n')
 
     subplot(3,2,2)
-    plot(t, e, 'k.',t, ez, 'r.',t, ef, 'b.')
+    plot(t, e, 'k-',t, ez, 'r.',t, ef, 'b-')
     ylim(marginize_axis_limits(ylim, 1.0));
     legend('true', 'measured', 'filtered', 'Location', 'Best')
     grid on
     title('e')
 
     subplot(3,2,3)
-    plot(t, vn, 'k.', t, vnf, 'b.')
+    plot(t, vn, 'k-', t, vnf, 'b-')
     ylim(marginize_axis_limits(ylim, 1.0));
     legend('true', 'filtered', 'Location', 'Best')
     grid on
     title('v_n')
 
     subplot(3,2,4)
-    plot(t, ve, 'k.', t, vef, 'b.')
+    plot(t, ve, 'k-', t, vef, 'b-')
     ylim(marginize_axis_limits(ylim, 1.0));
     legend('true', 'filtered', 'Location', 'Best')
     grid on
     title('v_e')
 
     subplot(3,2,5)
-    plot(t, r, 'k.', t, rz, 'r.', t, rf, 'b.')
+    plot(t, r, 'k-', t, rz, 'r.', t, rf, 'b-')
     ylim(marginize_axis_limits(ylim, 1.0));
     legend('true', 'measured', 'filtered', 'Location', 'Best')
     grid on
     title('Range')
 
     subplot(3,2,6)
-    plot(t, rad2deg(theta), 'k.', t, rad2deg(thetaz), 'r.', t, rad2deg(thetaf), 'b.')
+    plot(t, rad2deg(theta), 'k-', t, rad2deg(thetaz), 'r.', t, rad2deg(thetaf), 'b-')
     legend('true', 'measured', 'filtered', 'Location', 'Best')
     ylim([-180 180])
     yticks([-180:45:180])
