@@ -1,6 +1,6 @@
 # KF Workshop
 
-A MATLAB workspace to explore various Kalman filtering techniques.
+A MATLAB/Octave workspace to explore various Kalman filtering techniques.
 
 The following filter types are explored:
 - Linear Kalman filter, Transformed Range and Bearing Measurements
@@ -25,10 +25,10 @@ Six flight scenarios are simulated:
 1. square
 1. wiggle
 
-Run the "setup_env" script in Octave to add the necessary subdirectories to
+Run the "setup_env" script to add the necessary subdirectories to
 the function search path.
 
-To generate plots, run "fly scenario" in Octave, where "scenario" is one of
+To generate plots, run "fly scenario," where "scenario" is one of
 the above scenario names. If just "fly" is specified, the "line" scenario is
 run.
 
