@@ -235,10 +235,15 @@ function plot_results(label, t, n, e, r, theta, vn, ve, vr,...
 
     figure('name', ['Parametric - ', label]);
 
-    plot(e, n, 'k-', ez, nz, 'r.', ef, nf, 'b-')
+    plot(e, n, 'k-',...
+         ez, nz, 'r.',...
+         ef, nf, 'b-',...
+         e(1), n(1), 'ko',...
+         ez(1), nz(1), 'ro',...
+         ef(1), nf(1), 'bo')
     axis([-50, 50, -50, 50], 'square')
-    xticks([-50:10:50])
-    yticks([-50:10:50])
+    xticks(-50:10:50)
+    yticks(-50:10:50)
     legend('true', 'measured', 'filtered', 'Location', 'Best')
     grid on
 
@@ -339,7 +344,7 @@ function plot_results(label, t, n, e, r, theta, vn, ve, vr,...
     plot(t, rad2deg(theta), 'k-', t, rad2deg(thetaz), 'r.', t, rad2deg(thetaf), 'b-')
     legend('true', 'measured', 'filtered', 'Location', 'Best')
     ylim([-180 180])
-    yticks([-180:45:180])
+    yticks(-180:45:180)
     grid on
     title('Angle')
 
